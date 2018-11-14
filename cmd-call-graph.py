@@ -138,7 +138,7 @@ def BuildCallGraph(input_file, args, log_file=sys.stderr):
             
             if token == "exit" or token == "@exit":
                 target = ""
-                if i < len(tokens):
+                if i+1 < len(tokens):
                     target = tokens[i+1]
                 interesting_commands.append(("exit", target))
         
