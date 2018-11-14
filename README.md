@@ -1,5 +1,5 @@
 # cmd-call-graph
-A simple tool to generate a call graph for Windows CMD (batch) files.
+A simple tool to generate a call graph for calls within Windows CMD (batch) files.
 
 It takes the input file as stdin and outputs the resulting file to stdout,
 outputting logs and errors to stderr.
