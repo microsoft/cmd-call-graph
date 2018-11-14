@@ -15,6 +15,32 @@ graphviz:
     $ dot -Tpng your-file-call-graph.dot > your-file-call-graph.png
     $ explorer.exe your-file-call-graph.png
 
+## Example
+
+Here is an example CMD script:
+
+    @echo off
+    call :foo
+    goto :eof
+    :bar
+    echo "in bar"
+    call :baz
+    call :baz
+    :baz
+    echo "in baz"
+    :foo
+    echo "In foo"
+    goto :bar
+
+This script would generate the following graph:
+
+![call graph](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-noshowall.png)
+
+If the `--show-all-calls` option is set to `True`, then the following graph would be generated:
+
+![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
+
+
 ## Why?
 Sometimes legacy code bases may contain old CMD files. This tool allows to
 generate a visual representation of the internal calls within the script.
