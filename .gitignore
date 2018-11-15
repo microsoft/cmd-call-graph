@@ -106,3 +106,6 @@ venv.bak/
 # vim
 *~
 *.un~
+
+# Visual Studio Code
+.vscode
