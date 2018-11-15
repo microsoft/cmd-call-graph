@@ -6,11 +6,13 @@ import sys
 
 Connection = collections.namedtuple("Connection", ["dst", "kind", "line_number"])
 
+NO_LINE_NUMBER = -1
+
 class Node:
     def __init__(self, name):
         self.name = name
         self.connections = set()
-        self.line_number = -1
+        self.line_number = NO_LINE_NUMBER
         self.original_name = ""
         self.is_exit_node = False
 
@@ -18,9 +20,8 @@ class Node:
         self.connections.add(Connection(dst, kind, line_number))
 
 class CallGraph:
-    def __init__(self, allcalls):
+    def __init__(self):
         self.nodes = {}
-        self.allcalls = allcalls
 
     def GetNode(self, name):
         if name in self.nodes:
@@ -55,21 +56,16 @@ class CallGraph:
             if attributes:
                 print("{} [{}]".format(name, ",".join(attributes)), file=out_file)
 
-            connections = node.connections
-            if not self.allcalls:
-                # Need to de-duplicate by line number.
-                connections = set(Connection(c.dst, c.kind, 0) for c in connections)
-
             for c in node.connections:
                 label = c.kind
-                if self.allcalls:
+                if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
                 print("{} -> {} [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
 
         print("}", file=out_file)
 
-def BuildCallGraph(input_file, args, log_file=sys.stderr):
-    call_graph = CallGraph(args)
+def BuildCallGraph(input_file, all_calls, log_file=sys.stderr):
+    call_graph = CallGraph()
     cur_node = call_graph.GetNode("__begin__")
     cur_node.line_number = 1
 
@@ -82,6 +78,11 @@ def BuildCallGraph(input_file, args, log_file=sys.stderr):
         # name of labels (typically in some form of camelcase for readability).
         orig_line = orig_line.strip()
         line = orig_line.lower()
+
+        # If all_calls is true, we want to keep connections unique by line number
+        # (showing all of them), otherwise we don't want to consider the line number
+        # when creating connections.
+        line_number_to_store = line_number if all_calls else NO_LINE_NUMBER
 
         # Skip empty lines and comments.
         if not line or line.startswith("::") or line.startswith("rem"):
@@ -103,7 +104,7 @@ def BuildCallGraph(input_file, args, log_file=sys.stderr):
             next_node.line_number = line_number+1  # Correct starting at 0.
             next_node.original_name = orig_line[1:].split()[0].strip()
             if line_number-1 not in terminating_line_numbers:
-                cur_node.AddConnection(next_node, "nested", line_number)
+                cur_node.AddConnection(next_node, "nested", line_number_to_store)
 
             cur_node = next_node
             continue
@@ -143,7 +144,7 @@ def BuildCallGraph(input_file, args, log_file=sys.stderr):
         for command, target in interesting_commands:
             if command == "call" or command == "goto":
                 next_node = call_graph.GetNode(target)
-                cur_node.AddConnection(next_node, command, line_number)
+                cur_node.AddConnection(next_node, command, line_number_to_store)
                 print("Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, cur_node.name), file=log_file)
             
             if (command == "goto" and target == "eof") or command == "exit":
