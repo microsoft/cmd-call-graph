@@ -1,12 +1,15 @@
 # cmd-call-graph
 A simple tool to generate a call graph for calls within Windows CMD (batch) files.
 
+The tool is available on PyPI: https://pypi.org/project/cmd-call-graph/
+
 It takes the input file as stdin and outputs the resulting file to stdout,
 outputting logs and errors to stderr.
 
 Usage example from WSL (Windows Subsystem for Linux):
 
-    $ python3 cmd-call-graph.py < your-file.cmd > your-file-call-graph.dot 2>log
+    $ pip3 install cmd-call-graph
+    $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
 
 The resulting `dot` file can be rendered with any `dot` renderer. Example with
 graphviz:
