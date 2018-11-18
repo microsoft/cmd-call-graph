@@ -8,7 +8,7 @@ outputting logs and errors to stderr.
 
 Usage example from WSL (Windows Subsystem for Linux):
 
-    $ pip3 install cmd-call-graph
+    $ pip install cmd-call-graph
     $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
 
 The resulting `dot` file can be rendered with any `dot` renderer. Example with
@@ -65,4 +65,4 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## Unit tests
 Run unit tests from the project root by running:
 
-    python3 -m unittest
+    python -m unittest discover
