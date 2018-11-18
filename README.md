@@ -1,6 +1,6 @@
 # cmd-call-graph
 
-[![Build Status](https://api.travis-ci.org/Microsoft/cmd-call-graph.svg?branch=master)](http://travis-ci.org/lupino3/edumips64)
+[![Build Status](https://api.travis-ci.org/Microsoft/cmd-call-graph.svg?branch=master)](http://travis-ci.org/Microsoft/cmd-call-graph)
 
 A simple tool to generate a call graph for calls within Windows CMD (batch) files.
 
