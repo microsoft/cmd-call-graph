@@ -1,4 +1,7 @@
 # cmd-call-graph
+
+[![Build Status](https://api.travis-ci.org/Microsoft/cmd-call-graph.svg?branch=master)](http://travis-ci.org/lupino3/edumips64)
+
 A simple tool to generate a call graph for calls within Windows CMD (batch) files.
 
 The tool is available on PyPI: https://pypi.org/project/cmd-call-graph/
