@@ -1,5 +1,7 @@
 # Core functionality of cmd-call-graph.
 
+from __future__ import print_function
+
 import argparse
 import collections
 import sys
@@ -156,3 +158,14 @@ def BuildCallGraph(input_file, all_calls, log_file=sys.stderr):
     # If we reached EOF, this means that the current node will cause the program to finish.
     cur_node.is_exit_node = True
     return call_graph
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--show-all-calls", type=bool,
+                        help="Set to true to show all calls in the graph.", default=False,
+                        dest="allcalls")
+    args = parser.parse_args()
+
+    call_graph = BuildCallGraph(sys.stdin, args.allcalls)
+    call_graph.PrintDot()
