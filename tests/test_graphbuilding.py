@@ -40,7 +40,7 @@ class BasicBuildTests(CallGraphTest):
     
 class AllGraphTest(CallGraphTest):
     def setUp(self):
-        super().setUp()
+        CallGraphTest.setUp(self)
         # Code contains a double call to the same label.
         # If allgraph is set to False, it should count as a single call,
         # while if it's set to True it should count as a double call.
