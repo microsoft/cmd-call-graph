@@ -10,6 +10,10 @@ Connection = collections.namedtuple("Connection", ["dst", "kind", "line_number"]
 
 NO_LINE_NUMBER = -1
 
+# Represents a line of code. The text is saves as trimmed and in lowercase.
+CodeLine = collections.namedtuple("CodeLine", "number,text")
+
+# Represents a node in the call graph.
 class Node:
     def __init__(self, name):
         self.name = name
@@ -17,14 +21,18 @@ class Node:
         self.line_number = NO_LINE_NUMBER
         self.original_name = ""
         self.is_exit_node = False
+        self.code = []
 
     def AddConnection(self, dst, kind, line_number):
         self.connections.add(Connection(dst, kind, line_number))
+    
+    def AddCodeLine(self, line_number, code):
+        self.code.append(CodeLine(line_number+1, code.strip().lower()))
 
 class CallGraph:
     def __init__(self):
         self.nodes = {}
-
+    
     def GetNode(self, name):
         if name in self.nodes:
             return self.nodes[name]
@@ -93,8 +101,10 @@ def BuildCallGraph(input_file, all_calls, log_file=sys.stderr):
             # are present between the terminating line number and the current one.
             if line_number-1 in terminating_line_numbers:
                 terminating_line_numbers.add(line_number)
+            cur_node.AddCodeLine(line_number, orig_line)
             continue
 
+        # Start of new block.
         if line.startswith(":"):
             # In the off chance that there are multiple words, cmd considers the first word the label name.
             block_name = line[1:].split()[0].strip()
@@ -109,10 +119,12 @@ def BuildCallGraph(input_file, all_calls, log_file=sys.stderr):
                 cur_node.AddConnection(next_node, "nested", line_number_to_store)
 
             cur_node = next_node
+            cur_node.AddCodeLine(line_number, orig_line)
             continue
         
-        tokens = line.split()
+        cur_node.AddCodeLine(line_number, orig_line)
 
+        tokens = line.split()
         interesting_commands = []
 
         for i, token in enumerate(tokens):

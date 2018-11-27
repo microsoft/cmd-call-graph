@@ -2,6 +2,7 @@ import os
 import unittest
 
 from callgraph import callgraph
+CodeLine = callgraph.CodeLine
 
 class CallGraphTest(unittest.TestCase):
     def setUp(self):
@@ -37,6 +38,27 @@ class BasicBuildTests(CallGraphTest):
         connection = begin.connections.pop()
         self.assertEqual("call", connection.kind)
         self.assertEqual("foo", connection.dst.name)
+
+    def test_code_in_nodes(self):
+        code = """
+        call :foo
+        exit 
+        :foo
+        goto :eof
+        """.split("\n")
+        call_graph = callgraph.BuildCallGraph(code, False, self.devnull)
+        begin = call_graph.nodes["__begin__"]
+        foo = call_graph.nodes["foo"]
+        self.assertEqual(begin.code, [
+            CodeLine(1, ""), 
+            CodeLine(2, "call :foo"),
+            CodeLine(3, "exit"),
+        ])
+        self.assertEqual(foo.code, [
+            CodeLine(4, ":foo"),
+            CodeLine(5, "goto :eof"),
+            CodeLine(6, ""),
+        ])
     
 class AllGraphTest(CallGraphTest):
     def setUp(self):
@@ -61,6 +83,6 @@ class AllGraphTest(CallGraphTest):
         call_graph = callgraph.BuildCallGraph(self.code, True, self.devnull)
         begin = call_graph.nodes["__begin__"]
         self.assertEqual(2, len(begin.connections))
-    
+
 if __name__ == "__main__":
     unittest.main()
