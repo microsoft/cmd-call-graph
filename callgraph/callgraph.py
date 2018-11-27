@@ -29,6 +29,11 @@ class Node:
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number+1, code.strip().lower()))
 
+    def __lt__(self, other):
+        if other == None:
+            return False
+        return self.name < other.name
+
 class CallGraph:
     def __init__(self):
         self.nodes = {}
@@ -50,7 +55,7 @@ class CallGraph:
         # Output the DOT code.
         print("digraph g {", file=out_file)
 
-        for node in self.nodes.values():
+        for node in sorted(self.nodes.values()):
             name = node.name
             pretty_name = name
             if node.original_name != "":
@@ -66,7 +71,7 @@ class CallGraph:
             if attributes:
                 print("{} [{}]".format(name, ",".join(attributes)), file=out_file)
 
-            for c in node.connections:
+            for c in sorted(node.connections):
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
