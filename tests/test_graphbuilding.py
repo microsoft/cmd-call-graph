@@ -39,6 +39,24 @@ class BasicBuildTests(CallGraphTest):
         self.assertEqual("call", connection.kind)
         self.assertEqual("foo", connection.dst.name)
 
+    def test_simple_terminating(self):
+        code = """
+        goto :foo
+        :foo
+        something
+        something
+        """.split("\n")
+
+        call_graph = callgraph.BuildCallGraph(code, False, self.devnull)
+        self.assertEqual(2, len(call_graph.nodes))
+        self.assertIn("foo", call_graph.nodes.keys())
+
+        foo_node = call_graph.nodes["foo"]
+        begin_node = call_graph.nodes["__begin__"]
+
+        self.assertTrue(foo_node.is_exit_node)
+        self.assertFalse(begin_node.is_exit_node)
+
     def test_code_in_nodes(self):
         code = """
         call :foo
