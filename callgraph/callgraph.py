@@ -69,13 +69,13 @@ class CallGraph:
                 attributes.append("color=red")
                 attributes.append("penwidth=2")
             if attributes:
-                print("{} [{}]".format(name, ",".join(attributes)), file=out_file)
+                print("\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
 
             for c in sorted(node.connections):
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
-                print("{} -> {} [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
+                print("\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
 
         print("}", file=out_file)
 
