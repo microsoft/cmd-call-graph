@@ -112,7 +112,7 @@ class CallGraph:
                 if command == "call" or command == "goto":
                     target_node = self.nodes[target]
                     node.AddConnection(target_node, command, line_number)
-                    print("Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
+                    print(u"Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
                 
                 if (command == "goto" and target == "eof") or command == "exit":
                     line.terminating = True
@@ -128,7 +128,7 @@ class CallGraph:
             "call": "green3",
         }
         # Output the DOT code.
-        print("digraph g {", file=out_file)
+        print(u"digraph g {", file=out_file)
 
         for node in sorted(self.nodes.values()):
             name = node.name
@@ -144,7 +144,7 @@ class CallGraph:
                 attributes.append("color=red")
                 attributes.append("penwidth=2")
             if attributes:
-                print("\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
+                print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
 
             # De-duplicate connections by line number if show_all_calls is set to False.
             connections = node.connections
@@ -155,9 +155,9 @@ class CallGraph:
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
-                print("\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
+                print(u"\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
 
-        print("}", file=out_file)
+        print(u"}", file=out_file)
 
     @staticmethod
     def Build(input_file, log_file=sys.stderr):
@@ -219,7 +219,7 @@ class CallGraph:
                 # Since cmd is case-insensitive, let's convert block names to lowercase.
                 block_name = original_block_name.lower()
 
-                print("Line {} defines a new block: <{}>".format(line_number, block_name), file=log_file)
+                print(u"Line {} defines a new block: <{}>".format(line_number, block_name), file=log_file)
                 if block_name:
                     next_node = call_graph.GetOrCreateNode(block_name)
                     next_node.line_number = line_number
