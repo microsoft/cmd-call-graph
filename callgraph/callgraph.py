@@ -177,6 +177,7 @@ class CallGraph:
         
         # Find exit nodes.
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
+        print("{0} is the last node, therefore it's an exit node.".format(last_node.name), file=log_file)
         last_node.is_exit_node = True
 
         # Find and mark the "nested" connections.
@@ -189,6 +190,8 @@ class CallGraph:
             # Special case: the previous node has no code or all lines are comments / empty lines.
             all_noop = all(line.noop for line in prev_node.code)
             if not prev_node.code or all_noop:
+                print("Adding nested connection between {0} and {1} because all_noop ({2}) or empty code ({3})".format(
+                    prev_node.name, cur_node.name, all_noop, not prev_node.code), file=log_file)
                 prev_node.AddConnection(cur_node, "nested")
                 break
 
@@ -204,6 +207,8 @@ class CallGraph:
                 
                 commands = set(c.command for c in line.commands)
                 if "exit" not in commands and "goto" not in commands:
+                    print("Adding nested connection between {0} and {1} because there is a non-exit or non-goto command.".format(
+                        prev_node.name, cur_node.name), file=log_file)
                     prev_node.AddConnection(cur_node, "nested")
 
                 break
