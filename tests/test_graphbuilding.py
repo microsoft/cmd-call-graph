@@ -177,7 +177,7 @@ class BasicBuildTests(CallGraphTest):
 # If allgraph is set to False, it should count as a single call,
 # and no line annotations should appear in the graph,
 # while if it's set to True it should count as a double call.
-class AllGraphTest(CallGraphTest):
+class PrintOptionsGraphTest(CallGraphTest):
     def setUp(self):
         CallGraphTest.setUp(self)
         code ="""
@@ -208,6 +208,14 @@ class AllGraphTest(CallGraphTest):
         self.assertEqual(0, dot.count("line 2"))
         self.assertEqual(0, dot.count("line 3"))
 
+    def test_loc(self):
+        f = io.StringIO()
+        self.call_graph.PrintDot(f, show_node_stats=True)
+        dot = f.getvalue()
+
+        # Check the number of lines of code.
+        self.assertEqual(1, dot.count('3 LOC'))
+        self.assertEqual(1, dot.count('4 LOC'))
 
     def test_duplicate_allgraph(self):
         f = io.StringIO()

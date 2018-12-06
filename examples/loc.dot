@@ -1,0 +1,11 @@
+digraph g {
+"__begin__" [label=<<b>__begin__</b><br/>(line 1)<br/><sub>[0 LOC]</sub>>]
+"eof" [label=<<b>eof</b><br/><sub>[0 LOC]</sub>>,color=red,penwidth=2]
+"four" [label=<<b>four</b><br/>(line 7)<br/><sub>[4 LOC]</sub>>,color=red,penwidth=2]
+"one" [label=<<b>one</b><br/>(line 1)<br/><sub>[1 LOC]</sub>>]
+"one" -> "two" [label=nested,color=blue3]
+"three" [label=<<b>three</b><br/>(line 4)<br/><sub>[3 LOC]</sub>>]
+"three" -> "four" [label=nested,color=blue3]
+"two" [label=<<b>two</b><br/>(line 2)<br/><sub>[2 LOC]</sub>>]
+"two" -> "three" [label=nested,color=blue3]
+}

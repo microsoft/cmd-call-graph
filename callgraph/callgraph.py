@@ -121,7 +121,7 @@ class CallGraph:
                     line.terminating = True
                     node.is_exit_node = True
 
-    def PrintDot(self, out_file=sys.stdout, show_all_calls=True):
+    def PrintDot(self, out_file=sys.stdout, show_all_calls=True, show_node_stats=False):
         kind_colors = {
             "goto": "red3",
             "nested": "blue3",
@@ -137,9 +137,16 @@ class CallGraph:
                 pretty_name = node.original_name
 
             attributes = []
+            label_lines = ["<b>{}</b>".format(pretty_name)]
 
             if node.line_number > 0:
-                attributes.append("label=<<b>{}</b><br />(line {})>".format(pretty_name, node.line_number))
+                label_lines.append("(line {})".format(node.line_number))
+
+            if show_node_stats:
+                label_lines.append("<sub>[{} LOC]</sub>".format(len(node.code)))
+               
+            attributes.append("label=<{}>".format("<br/>".join(label_lines)))
+
             if node.is_exit_node:
                 attributes.append("color=red")
                 attributes.append("penwidth=2")
@@ -237,7 +244,10 @@ def main():
     parser.add_argument("--show-all-calls", type=bool,
                         help="Set to true to show all calls in the graph.", default=False,
                         dest="allcalls")
+    parser.add_argument("--show-node-stats", type=bool,
+                        help="Set to true to show statistics about the nodes in the graph.",
+                        default=False, dest="nodestats")
     args = parser.parse_args()
 
     call_graph = CallGraph.Build(sys.stdin)
-    call_graph.PrintDot(sys.stdout, args.allcalls)
+    call_graph.PrintDot(sys.stdout, args.allcalls, args.nodestats)
