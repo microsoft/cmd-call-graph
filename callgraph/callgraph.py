@@ -21,7 +21,7 @@ class CodeLine:
         self.commands = []
 
     def __repr__(self):
-        return "[{0} (terminating: {1})] {2}".format(self.number, self.terminating, self.text)
+        return "[{0} (terminating: {1}, noop: {2})] {3}".format(self.number, self.terminating, self.noop, self.text)
     
     def __eq__(self, other):
         return other is not None and self.number == other.number and self.text == other.text and self.terminating == other.terminating
@@ -44,6 +44,9 @@ class Node:
     
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
+
+    def __repr__(self):
+        return "{0}. {1}, {2}".format(self.name, self.code, self.connections)
 
     def __lt__(self, other):
         if other == None:
@@ -176,11 +179,18 @@ class CallGraph:
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
         last_node.is_exit_node = True
 
-        nodes_by_line_number = sorted(call_graph.nodes.values(), key=lambda x: x.line_number)
         # Find and mark the "nested" connections.
+        nodes = [n for n in call_graph.nodes.values() if n.line_number != NO_LINE_NUMBER]
+        nodes_by_line_number = sorted(nodes, key=lambda x: x.line_number)
         for i in range(1, len(nodes_by_line_number)):
             cur_node = nodes_by_line_number[i]
             prev_node = nodes_by_line_number[i-1]
+
+            # Special case: the previous node has no code or all lines are comments / empty lines.
+            all_noop = all(line.noop for line in prev_node.code)
+            if not prev_node.code or all_noop:
+                prev_node.AddConnection(cur_node, "nested")
+                break
 
             # Heuristic for "nested" connections:
             # iterate the previous node's commands, and create a nested connection
@@ -231,6 +241,11 @@ class CallGraph:
                     next_node = call_graph.GetOrCreateNode(block_name)
                     next_node.line_number = line_number
                     next_node.original_name = original_block_name
+
+                    # If this node is defined on line one, remove __begin__, so we avoid having two
+                    # nodes with the same line number.
+                    if line_number == 1:
+                        del call_graph.nodes["__begin__"]
 
                     cur_node = next_node
             

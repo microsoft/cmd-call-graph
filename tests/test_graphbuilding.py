@@ -74,8 +74,7 @@ class BasicBuildTests(CallGraphTest):
 
     def test_eof_defined_once(self):
         call_graph = callgraph.CallGraph.Build([":eof"], self.devnull)
-        self.assertEqual(2, len(call_graph.nodes))
-        self.assertIn("__begin__", call_graph.nodes.keys())
+        self.assertEqual(1, len(call_graph.nodes))
         self.assertIn("eof", call_graph.nodes.keys())
     
     def test_simple_call(self):
@@ -172,6 +171,26 @@ class BasicBuildTests(CallGraphTest):
             CodeLine(6, ""),
         ])
         self.assertEqual(True, foo.code[2].noop)
+
+    def test_empty_lines_nested(self):
+        code = """
+        :foo
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        begin = call_graph.nodes["__begin__"]
+
+        self.assertEqual(1, len(begin.connections), begin.code)
+        self.assertEqual("nested", begin.connections.pop().kind)
+
+    def test_empty_node_nested(self):
+        code = """:foo
+        :bar
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        begin = call_graph.nodes["foo"]
+
+        self.assertEqual(1, len(begin.connections))
+        self.assertEqual("nested", begin.connections.pop().kind)
     
 # The code contains a double call to the same label (foo).
 # If allgraph is set to False, it should count as a single call,

@@ -1,5 +1,4 @@
 digraph g {
-"__begin__" [label=<<b>__begin__</b><br/>(line 1)<br/><sub>[0 LOC]</sub>>]
 "eof" [label=<<b>eof</b><br/><sub>[0 LOC]</sub>>,color=red,penwidth=2]
 "four" [label=<<b>four</b><br/>(line 7)<br/><sub>[4 LOC]</sub>>,color=red,penwidth=2]
 "one" [label=<<b>one</b><br/>(line 1)<br/><sub>[1 LOC]</sub>>]
