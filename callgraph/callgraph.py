@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import argparse
 import collections
+import itertools
 import sys
 
 NO_LINE_NUMBER = -1
@@ -179,6 +180,15 @@ class CallGraph:
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
         print("{0} is the last node, therefore it's an exit node.".format(last_node.name), file=log_file)
         last_node.is_exit_node = True
+
+        # Prune away EOF if it is a virtual node (no line number) and there are no connections to it.
+        eof = call_graph.GetOrCreateNode("eof")
+        if eof.line_number == NO_LINE_NUMBER:
+            all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
+            destinations = set(c.dst.name for c in all_connections)
+            if "eof" not in destinations:
+                print("Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
+                del call_graph.nodes["eof"]
 
         # Find and mark the "nested" connections.
         nodes = [n for n in call_graph.nodes.values() if n.line_number != NO_LINE_NUMBER]

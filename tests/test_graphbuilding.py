@@ -68,9 +68,8 @@ class ParseSourceTests(CallGraphTest):
 class BasicBuildTests(CallGraphTest):
     def test_empty(self):
         call_graph = callgraph.CallGraph.Build("", self.devnull)
-        self.assertEqual(2, len(call_graph.nodes))
+        self.assertEqual(1, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
-        self.assertIn("eof", call_graph.nodes.keys())
 
     def test_eof_defined_once(self):
         call_graph = callgraph.CallGraph.Build([":eof"], self.devnull)
@@ -106,7 +105,7 @@ class BasicBuildTests(CallGraphTest):
         """.split("\n")
 
         call_graph = callgraph.CallGraph.Build(code, self.devnull)
-        self.assertEqual(3, len(call_graph.nodes))
+        self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("foo", call_graph.nodes.keys())
 
         foo_node = call_graph.nodes["foo"]
@@ -124,7 +123,7 @@ class BasicBuildTests(CallGraphTest):
         """.split("\n")
 
         call_graph = callgraph.CallGraph.Build(code, self.devnull)
-        self.assertEqual(3, len(call_graph.nodes))
+        self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("foo", call_graph.nodes.keys())
 
         foo_node = call_graph.nodes["foo"]
@@ -140,7 +139,7 @@ class BasicBuildTests(CallGraphTest):
         something
         """.split("\n")
         call_graph = callgraph.CallGraph.Build(code, self.devnull)
-        self.assertEqual(3, len(call_graph.nodes))
+        self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("bar", call_graph.nodes.keys())
 
         begin_node = call_graph.nodes["__begin__"]
