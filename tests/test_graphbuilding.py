@@ -148,6 +148,16 @@ class BasicBuildTests(CallGraphTest):
 
         self.assertEqual("nested", connection.kind)
 
+    def test_block_end_goto_no_nested(self):
+        code = """
+        goto :eof
+        :foo
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        begin_node = call_graph.nodes["__begin__"]
+        self.assertEqual(1, len(begin_node.connections))
+        connection = begin_node.connections.pop()
+        self.assertEqual("goto", connection.kind)
 
     def test_code_in_nodes(self):
         code = """
