@@ -132,6 +132,30 @@ class BasicBuildTests(CallGraphTest):
         self.assertTrue(foo_node.is_exit_node)
         self.assertFalse(begin_node.is_exit_node)
 
+    def test_last_node_goto_not_terminating(self):
+        code = """
+        :foo
+        goto :eof
+        :bar
+        goto :foo
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        self.assertIn("bar", call_graph.nodes.keys())
+        bar_node = call_graph.nodes["bar"]
+        self.assertFalse(bar_node.is_exit_node)
+
+    def test_last_node_goto_eof_terminating(self):
+        code = """
+        :foo
+        goto :eof
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        self.assertIn("foo", call_graph.nodes.keys())
+        foo_node = call_graph.nodes["foo"]
+        self.assertTrue(foo_node.is_exit_node)
+
+
+
     def test_simple_nested(self):
         code = """
         something

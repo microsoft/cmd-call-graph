@@ -9,6 +9,6 @@ digraph g {
 "baz" [label=<<b>baz</b><br/>(line 8)>]
 "baz" -> "foo" [label=nested,color=blue3]
 "eof" [label=<<b>eof</b>>,color=red,penwidth=2]
-"foo" [label=<<b>foo</b><br/>(line 11)>,color=red,penwidth=2]
+"foo" [label=<<b>foo</b><br/>(line 11)>]
 "foo" -> "bar" [label=<<b>goto</b><br />(line 13)>,color=red3]
 }

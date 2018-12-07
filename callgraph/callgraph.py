@@ -178,8 +178,19 @@ class CallGraph:
         
         # Find exit nodes.
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
-        print("{0} is the last node, therefore it's an exit node.".format(last_node.name), file=log_file)
+        print("{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
         last_node.is_exit_node = True
+
+        # If the last node's last statement is a goto not going towards eof, then
+        # it's not an exit node.
+        for line in reversed(last_node.code):
+            if line.noop:
+                continue
+
+            for command, target in line.commands:
+                if command == "goto" and target and target != "eof":
+                    last_node.is_exit_node = False
+                    break
 
         # Prune away EOF if it is a virtual node (no line number) and there are no connections to it.
         eof = call_graph.GetOrCreateNode("eof")
