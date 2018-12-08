@@ -4,6 +4,17 @@ import unittest
 
 from callgraph import callgraph
 CodeLine = callgraph.CodeLine
+Command = callgraph.Command
+
+class CodeLineTest(unittest.TestCase):
+    def test_command_counters(self):
+        line = CodeLine(0, "foo")
+        line.AddCommand(Command("goto", ""))
+        line.AddCommand(Command("goto", ""))
+        line.AddCommand(Command("external_call", ""))
+
+        self.assertEqual(2, line.commands_counter["goto"])
+        self.assertEqual(1, line.commands_counter["external_call"])
 
 class CallGraphTest(unittest.TestCase):
     def setUp(self):

@@ -18,8 +18,12 @@ class CodeLine:
         self.text = text
         self.terminating = terminating
         self.noop = noop
-
         self.commands = []
+        self.commands_counter = collections.Counter()
+
+    def AddCommand(self, command):
+        self.commands.append(command)
+        self.commands_counter[command.command] += 1
 
     def __repr__(self):
         return "[{0} (terminating: {1}, noop: {2})] {3}".format(self.number, self.terminating, self.noop, self.text)
@@ -40,13 +44,24 @@ class Node:
         self.original_name = name
         self.is_exit_node = False
         self.code = []
+        self.loc = 0
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
     
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
+        self.loc += 1
+    
+    def GetCommandCount(self):
+        node_counter = collections.Counter()
 
+        for line in self.code:
+            for command, count in line.commands_counter.items():
+                node_counter[command] += count
+        
+        return node_counter
+    
     def __repr__(self):
         return "{0}. {1}, {2}".format(self.name, self.code, self.connections)
 
@@ -94,25 +109,25 @@ class CallGraph:
                     block_name = tokens[i+1][1:]
                     if not block_name:
                         continue
-                    line.commands.append(Command("goto", block_name))
+                    line.AddCommand(Command("goto", block_name))
                     continue
 
                 if token == "call" or token == "@call":
                     target = tokens[i+1]
                     if target[0] != ":":
-                        line.commands.append(Command("external_call", target))
+                        line.AddCommand(Command("external_call", target))
                         continue
                     block_name = target[1:]
                     if not block_name:
                         continue
-                    line.commands.append(Command("call", block_name))
+                    line.AddCommand(Command("call", block_name))
                     continue
                 
                 if token == "exit" or token == "@exit":
                     target = ""
                     if i+1 < len(tokens):
                         target = tokens[i+1]
-                    line.commands.append(Command("exit", target))
+                    line.AddCommand(Command("exit", target))
             
             for command, target in line.commands:
                 if command == "call" or command == "goto":
@@ -152,9 +167,10 @@ class CallGraph:
                 label_lines.append("(line {})".format(node.line_number))
 
             if show_node_stats:
-                label_lines.append("<sub>[{} LOC]</sub>".format(len(node.code)))
-                commands = [l.command for c in node.code for l in c.commands]
-                external_call_count = commands.count("external_call")
+                label_lines.append("<sub>[{} LOC]</sub>".format(node.loc))
+                command_count = node.GetCommandCount()
+                external_call_count = command_count["external_call"]
+
                 if external_call_count > 0:
                     text = "call" if external_call_count == 1 else "calls"
                     label_lines.append("<sub>[{} external {}]</sub>".format(external_call_count, text))
