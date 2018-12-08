@@ -31,14 +31,14 @@ Here is an example CMD script:
     call :foo
     goto :eof
     :bar
-    echo "in bar"
-    call :baz
-    call :baz
+        echo "in bar"
+        call :baz
+        call :baz
     :baz
-    echo "in baz"
+        echo "in baz"
     :foo
-    echo "In foo"
-    goto :bar
+        echo "In foo"
+        goto :bar
 
 This script would generate the following graph:
 
