@@ -7,4 +7,9 @@
 :four
     rem second line
     rem third line
-    rem fourth line
+    call powershell.exe foo.ps1
+:five
+    rem second line
+    rem third line
+    call powershell.exe foo.ps1
+    call powershell.exe foo.ps1

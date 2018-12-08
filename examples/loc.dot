@@ -1,5 +1,7 @@
 digraph g {
-"four" [label=<<b>four</b><br/>(line 7)<br/><sub>[4 LOC]</sub>>,color=red,penwidth=2]
+"five" [label=<<b>five</b><br/>(line 11)<br/><sub>[5 LOC]</sub><br/><sub>[2 external calls]</sub>>,color=red,penwidth=2]
+"four" [label=<<b>four</b><br/>(line 7)<br/><sub>[4 LOC]</sub><br/><sub>[1 external calls]</sub>>]
+"four" -> "five" [label=nested,color=blue3]
 "one" [label=<<b>one</b><br/>(line 1)<br/><sub>[1 LOC]</sub>>]
 "one" -> "two" [label=nested,color=blue3]
 "three" [label=<<b>three</b><br/>(line 4)<br/><sub>[3 LOC]</sub>>]

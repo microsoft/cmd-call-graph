@@ -235,8 +235,11 @@ class PrintOptionsGraphTest(CallGraphTest):
         code ="""
         call :foo
         call :foo
+        call powershell.exe something.ps1
+        call powershell.exe something.ps1
         exit
         :foo
+        call powershell.exe something.ps1
         goto :eof
         """.split("\n")
 
@@ -266,8 +269,16 @@ class PrintOptionsGraphTest(CallGraphTest):
         dot = f.getvalue()
 
         # Check the number of lines of code.
-        self.assertEqual(1, dot.count('3 LOC'))
         self.assertEqual(1, dot.count('4 LOC'))
+        self.assertEqual(1, dot.count('6 LOC'))
+
+    def test_external_call(self):
+        f = io.StringIO()
+        self.call_graph.PrintDot(f, show_node_stats=True)
+        dot = f.getvalue()
+
+        self.assertEqual(1, dot.count('2 external calls]'))
+        self.assertEqual(1, dot.count('1 external call]'))
 
     def test_duplicate_allgraph(self):
         f = io.StringIO()

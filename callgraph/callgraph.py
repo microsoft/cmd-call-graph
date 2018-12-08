@@ -98,7 +98,7 @@ class CallGraph:
                 if token == "call" or token == "@call":
                     target = tokens[i+1]
                     if target[0] != ":":
-                        # Calling an external command. Not represented in the call graph by design.
+                        line.commands.append(Command("external_call", target))
                         continue
                     block_name = target[1:]
                     if not block_name:
@@ -148,6 +148,11 @@ class CallGraph:
 
             if show_node_stats:
                 label_lines.append("<sub>[{} LOC]</sub>".format(len(node.code)))
+                commands = [l.command for c in node.code for l in c.commands]
+                external_call_count = commands.count("external_call")
+                if external_call_count > 0:
+                    text = "call" if external_call_count == 1 else "calls"
+                    label_lines.append("<sub>[{} external {}]</sub>".format(external_call_count, text))
                
             attributes.append("label=<{}>".format("<br/>".join(label_lines)))
 
