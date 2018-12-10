@@ -125,7 +125,7 @@ class CallGraph:
                     line.terminating = True
                     node.is_exit_node = True
 
-    def PrintDot(self, out_file=sys.stdout, show_all_calls=True, show_node_stats=False):
+    def PrintDot(self, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None):
         kind_colors = {
             "goto": "red3",
             "nested": "blue3",
@@ -135,6 +135,10 @@ class CallGraph:
         print(u"digraph g {", file=out_file)
 
         for node in sorted(self.nodes.values()):
+            if nodes_to_hide and (node.name in nodes_to_hide):
+                print("Skipping node {0}".format(node.name), file=log_file)
+                continue
+
             name = node.name
             pretty_name = name
             if node.original_name != "":
@@ -166,8 +170,12 @@ class CallGraph:
             connections = node.connections
             if not show_all_calls:
                 connections = list(set(Connection(c.dst, c.kind, NO_LINE_NUMBER) for c in connections))
-
+            
             for c in sorted(connections):
+                # Remove EOF connections if necessary.
+                if nodes_to_hide and (c.dst.name in nodes_to_hide):
+                    print("Skipping connection to node {0}".format(c.dst.name), file=log_file)
+                    continue
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
@@ -293,7 +301,12 @@ def main():
     parser.add_argument("--show-node-stats", type=bool,
                         help="Set to true to show statistics about the nodes in the graph.",
                         default=False, dest="nodestats")
+    parser.add_argument("--nodes-to-hide", type=str, nargs="+", dest="nodestohide",
+                        help="List of space-separated nodes to hide.")
     args = parser.parse_args()
 
+    nodes_to_hide = set(x.lower() for x in args.nodestohide) if args.nodestohide else None
+
     call_graph = CallGraph.Build(sys.stdin)
-    call_graph.PrintDot(sys.stdout, args.allcalls, args.nodestats)
+    call_graph.PrintDot(sys.stdout, log_file=sys.stderr,
+                        show_all_calls=args.allcalls, show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide)

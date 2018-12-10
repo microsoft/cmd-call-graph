@@ -254,7 +254,7 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_duplicate_no_allgraph(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, False)
+        self.call_graph.PrintDot(f, show_all_calls=False)
         dot = f.getvalue()
         self.assertEqual(1, dot.count('"__begin__" -> "foo"'), "No connection found in the dot document: " + dot)
 
@@ -282,13 +282,19 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_duplicate_allgraph(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, True)
+        self.call_graph.PrintDot(f, show_all_calls=True)
         dot = f.getvalue()
         self.assertEqual(2, dot.count('"__begin__" -> "foo"'))
 
         # Test that connections do have line number annotations.
         self.assertEqual(1, dot.count("line 2"))
         self.assertEqual(1, dot.count("line 3"))
+    
+    def test_hide_eof(self):
+        f = io.StringIO()
+        self.call_graph.PrintDot(f, log_file=self.devnull, nodes_to_hide=set(["eof"]))
+        dot = f.getvalue()
+        self.assertEqual(0, dot.count("eof"))
 
 if __name__ == "__main__":
     unittest.main()
