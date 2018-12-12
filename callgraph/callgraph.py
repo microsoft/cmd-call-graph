@@ -70,6 +70,7 @@ class CallGraph:
     # Adds to each node information depending on the contents of the code, such as connections
     # deriving from goto/call commands and whether the node is terminating or not.
     def _AnnotateNode(self, node):
+        print("Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
         for i in range(len(node.code)):
             line = node.code[i]
             line_number = line.number
