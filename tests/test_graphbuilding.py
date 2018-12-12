@@ -49,6 +49,9 @@ class ParseSourceTests(CallGraphTest):
     def test_comment_ignore(self):
         code = """
         ::do something
+        @:: do something else
+        rem do something
+        @rem do something else
         :foo
         exit
         """.split("\n")
@@ -61,9 +64,13 @@ class ParseSourceTests(CallGraphTest):
         self.assertEqual(0, len(begin_node.connections))
         self.assertEqual(1, begin_node.line_number)
 
+        call_graph._AnnotateNode(begin_node)
+        for line in begin_node.code:
+            self.assertTrue(line.noop)
+
         foo_node = call_graph.nodes["foo"]
         self.assertEqual(0, len(foo_node.connections))
-        self.assertEqual(3, foo_node.line_number)
+        self.assertEqual(6, foo_node.line_number)
 
 class BasicBuildTests(CallGraphTest):
     def test_empty(self):

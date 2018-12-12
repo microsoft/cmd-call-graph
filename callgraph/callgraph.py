@@ -85,7 +85,7 @@ class CallGraph:
 
             for i, token in enumerate(tokens):
                 # Comment; stop processing the rest of the line.
-                if token == "::" or token == "rem":
+                if token.startswith("::") or token == "rem" or token.startswith("@::") or token == "@rem":
                     line.noop = True
                     break
 
