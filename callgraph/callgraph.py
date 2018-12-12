@@ -36,7 +36,7 @@ class Node:
         self.name = name
         self.connections = set()
         self.line_number = NO_LINE_NUMBER
-        self.original_name = ""
+        self.original_name = name
         self.is_exit_node = False
         self.code = []
 
