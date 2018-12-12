@@ -103,7 +103,19 @@ class BasicBuildTests(CallGraphTest):
 
         connection = begin.connections.pop()
         self.assertEqual("call", connection.kind)
-        self.assertEqual("foo", connection.dst.name)
+        self.assertEqual("foo", connection.dst)
+
+    def test_handle_nonexisting_target(self):
+        code = """
+        goto :nonexisting
+        """.split("\n")
+        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        self.assertEqual(1, len(call_graph.nodes))
+        self.assertIn("__begin__", call_graph.nodes.keys())
+        begin_node = call_graph.nodes["__begin__"]
+        self.assertEqual(1, len(begin_node.connections))
+        self.assertEqual("nonexisting", begin_node.connections.pop().dst)
+
 
     def test_exit_terminating(self):
         code = """

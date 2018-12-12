@@ -28,6 +28,7 @@ class CodeLine:
         return other is not None and self.number == other.number and self.text == other.text and self.terminating == other.terminating
 
 # Connection between two nodes.
+# dst is the name of the target node, kind is the type of connection, line_number is the line where the call/goto happens.
 Connection = collections.namedtuple("Connection", ["dst", "kind", "line_number"])
 
 # Node in the call graph.
@@ -115,8 +116,7 @@ class CallGraph:
             
             for command, target in line.commands:
                 if command == "call" or command == "goto":
-                    target_node = self.nodes[target]
-                    node.AddConnection(target_node, command, line_number)
+                    node.AddConnection(target, command, line_number)
                     print(u"Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
                 
                 if (command == "goto" and target == "eof") or command == "exit":
@@ -174,13 +174,13 @@ class CallGraph:
             
             for c in sorted(connections):
                 # Remove EOF connections if necessary.
-                if nodes_to_hide and (c.dst.name in nodes_to_hide):
-                    print("Skipping connection to node {0}".format(c.dst.name), file=log_file)
+                if nodes_to_hide and (c.dst in nodes_to_hide):
+                    print("Skipping connection to node {0}".format(c.dst), file=log_file)
                     continue
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
-                print(u"\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst.name, label, kind_colors[c.kind]), file=out_file)
+                print(u"\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst, label, kind_colors[c.kind]), file=out_file)
 
         print(u"}", file=out_file)
 
@@ -210,7 +210,7 @@ class CallGraph:
         eof = call_graph.GetOrCreateNode("eof")
         if eof.line_number == NO_LINE_NUMBER:
             all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
-            destinations = set(c.dst.name for c in all_connections)
+            destinations = set(c.dst for c in all_connections)
             if "eof" not in destinations:
                 print("Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
                 del call_graph.nodes["eof"]
@@ -227,7 +227,7 @@ class CallGraph:
             if not prev_node.code or all_noop:
                 print("Adding nested connection between {0} and {1} because all_noop ({2}) or empty code ({3})".format(
                     prev_node.name, cur_node.name, all_noop, not prev_node.code), file=log_file)
-                prev_node.AddConnection(cur_node, "nested")
+                prev_node.AddConnection(cur_node.name, "nested")
                 break
 
             # Heuristic for "nested" connections:
@@ -244,7 +244,7 @@ class CallGraph:
                 if "exit" not in commands and "goto" not in commands:
                     print("Adding nested connection between {0} and {1} because there is a non-exit or non-goto command.".format(
                         prev_node.name, cur_node.name), file=log_file)
-                    prev_node.AddConnection(cur_node, "nested")
+                    prev_node.AddConnection(cur_node.name, "nested")
 
                 break
 
