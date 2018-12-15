@@ -164,7 +164,7 @@ class CallGraph:
             if node.original_name != "":
                 pretty_name = node.original_name
             
-            pretty_name = self._Escape(pretty_name)
+            print("Processing node {0} (using name: {1})".format(node.name, pretty_name), file=log_file)
 
             attributes = []
             label_lines = ["<b>{}</b>".format(pretty_name)]
@@ -202,7 +202,9 @@ class CallGraph:
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
                     label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
-                print(u"\"{}\" -> \"{}\" [label={},color={}]".format(name, c.dst, label, kind_colors[c.kind]), file=out_file)
+                src_escaped_name = self._Escape(name)
+                dst_escaped_name = self._Escape(c.dst)
+                print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, kind_colors[c.kind]), file=out_file)
 
         print(u"}", file=out_file)
 

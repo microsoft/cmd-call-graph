@@ -285,7 +285,7 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_duplicate_no_allgraph(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, show_all_calls=False)
+        self.call_graph.PrintDot(f, show_all_calls=False, log_file=self.devnull)
         dot = f.getvalue()
         self.assertEqual(1, dot.count('"__begin__" -> "foo"'), "No connection found in the dot document: " + dot)
 
@@ -296,7 +296,7 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_loc(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, show_node_stats=True)
+        self.call_graph.PrintDot(f, show_node_stats=True, log_file=self.devnull)
         dot = f.getvalue()
 
         # Check the number of lines of code.
@@ -305,7 +305,7 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_external_call(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, show_node_stats=True)
+        self.call_graph.PrintDot(f, show_node_stats=True, log_file=self.devnull)
         dot = f.getvalue()
 
         self.assertEqual(1, dot.count('2 external calls]'))
@@ -313,7 +313,7 @@ class PrintOptionsGraphTest(CallGraphTest):
 
     def test_duplicate_allgraph(self):
         f = io.StringIO()
-        self.call_graph.PrintDot(f, show_all_calls=True)
+        self.call_graph.PrintDot(f, show_all_calls=True, log_file=self.devnull)
         dot = f.getvalue()
         self.assertEqual(2, dot.count('"__begin__" -> "foo"'))
 
@@ -331,7 +331,7 @@ class PrintOptionsGraphTest(CallGraphTest):
         f = io.StringIO()
         self.call_graph.PrintDot(f, log_file=self.devnull)
         dot = f.getvalue()
-        self.assertEqual(1, dot.count("%command%"), dot)
+        self.assertEqual(1, dot.count(r"\%command\%"), dot)
 
 if __name__ == "__main__":
     unittest.main()
