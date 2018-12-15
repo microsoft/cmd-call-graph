@@ -262,7 +262,7 @@ class BasicBuildTests(CallGraphTest):
 class PrintOptionsGraphTest(CallGraphTest):
     def setUp(self):
         CallGraphTest.setUp(self)
-        code ="""
+        code = """
         call :foo
         call :foo
         call powershell.exe something.ps1
@@ -270,13 +270,14 @@ class PrintOptionsGraphTest(CallGraphTest):
         exit
         :foo
         call powershell.exe something.ps1
+        goto :%command%
         goto :eof
         """.split("\n")
 
         self.call_graph = callgraph.CallGraph.Build(code, self.devnull)
         begin = self.call_graph.nodes["__begin__"]
 
-        # There should only be two connections of type call.
+        # There should only be two connections of type call in __begin__.
         self.assertEqual(2, len(begin.connections))
         kinds = set(c.kind for c in begin.connections)
         self.assertEqual(1, len(kinds))
@@ -299,7 +300,7 @@ class PrintOptionsGraphTest(CallGraphTest):
         dot = f.getvalue()
 
         # Check the number of lines of code.
-        self.assertEqual(1, dot.count('4 LOC'))
+        self.assertEqual(1, dot.count('5 LOC'))
         self.assertEqual(1, dot.count('6 LOC'))
 
     def test_external_call(self):
@@ -325,6 +326,12 @@ class PrintOptionsGraphTest(CallGraphTest):
         self.call_graph.PrintDot(f, log_file=self.devnull, nodes_to_hide=set(["eof"]))
         dot = f.getvalue()
         self.assertEqual(0, dot.count("eof"))
+    
+    def test_percent(self):
+        f = io.StringIO()
+        self.call_graph.PrintDot(f, log_file=self.devnull)
+        dot = f.getvalue()
+        self.assertEqual(1, dot.count("%command%"), dot)
 
 if __name__ == "__main__":
     unittest.main()

@@ -140,6 +140,10 @@ class CallGraph:
                 if command == "exit" and target == "":
                     line.terminating = True
                     node.is_exit_node = True
+    
+    @staticmethod
+    def _Escape(input_string):
+        return input_string.replace("%", r"\%")
 
     def PrintDot(self, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None):
         kind_colors = {
@@ -159,6 +163,8 @@ class CallGraph:
             pretty_name = name
             if node.original_name != "":
                 pretty_name = node.original_name
+            
+            pretty_name = self._Escape(pretty_name)
 
             attributes = []
             label_lines = ["<b>{}</b>".format(pretty_name)]
