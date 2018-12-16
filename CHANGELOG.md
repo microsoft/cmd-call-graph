@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Added a Changelog, that retroactively covers all versions.
 - Added an option (-v, --verbose) to enable/disable verbose output (Issue #5)
+- Added options for input file (-i, --input), output file (-o, --output) and
+  log file (-l, --log-file) (Issue #6)
 
 ### Fixed
 
