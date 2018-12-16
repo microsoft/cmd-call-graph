@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 import collections
 import itertools
+import io
 import sys
 
 NO_LINE_NUMBER = -1
@@ -321,17 +322,23 @@ class CallGraph:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--show-all-calls",
-                        help="Set to true to show all calls in the graph.",
+                        help="Set to show all calls in the graph.",
                         dest="allcalls", action="store_true")
     parser.add_argument("--show-node-stats",
-                        help="Set to true to show statistics about the nodes in the graph.",
+                        help="Set to show statistics about the nodes in the graph.",
                         dest="nodestats", action="store_true")
     parser.add_argument("--nodes-to-hide", type=str, nargs="+", dest="nodestohide",
                         help="List of space-separated nodes to hide.")
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="Output extra information about what the program does.")
     args = parser.parse_args()
 
     nodes_to_hide = set(x.lower() for x in args.nodestohide) if args.nodestohide else None
 
-    call_graph = CallGraph.Build(sys.stdin)
-    call_graph.PrintDot(sys.stdout, log_file=sys.stderr,
+    log_file = sys.stderr
+    if not args.verbose:
+        log_file = io.StringIO()  # will just be ignored
+
+    call_graph = CallGraph.Build(sys.stdin, log_file=log_file)
+    call_graph.PrintDot(sys.stdout, log_file=log_file,
                         show_all_calls=args.allcalls, show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide)
