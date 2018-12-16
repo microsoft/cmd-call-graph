@@ -87,7 +87,7 @@ class CallGraph:
     # Adds to each node information depending on the contents of the code, such as connections
     # deriving from goto/call commands and whether the node is terminating or not.
     def _AnnotateNode(self, node):
-        print("Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
+        print(u"Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
         for i in range(len(node.code)):
             line = node.code[i]
             line_number = line.number
@@ -157,7 +157,7 @@ class CallGraph:
 
         for node in sorted(self.nodes.values()):
             if nodes_to_hide and (node.name in nodes_to_hide):
-                print("Skipping node {0}".format(node.name), file=log_file)
+                print(u"Skipping node {0}".format(node.name), file=log_file)
                 continue
 
             name = node.name
@@ -165,7 +165,7 @@ class CallGraph:
             if node.original_name != "":
                 pretty_name = node.original_name
             
-            print("Processing node {0} (using name: {1})".format(node.name, pretty_name), file=log_file)
+            print(u"Processing node {0} (using name: {1})".format(node.name, pretty_name), file=log_file)
 
             attributes = []
             label_lines = ["<b>{}</b>".format(pretty_name)]
@@ -198,7 +198,7 @@ class CallGraph:
             for c in sorted(connections):
                 # Remove EOF connections if necessary.
                 if nodes_to_hide and (c.dst in nodes_to_hide):
-                    print("Skipping connection to node {0}".format(c.dst), file=log_file)
+                    print(u"Skipping connection to node {0}".format(c.dst), file=log_file)
                     continue
                 label = c.kind
                 if c.line_number != NO_LINE_NUMBER:
@@ -217,7 +217,7 @@ class CallGraph:
         
         # Find exit nodes.
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
-        print("{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
+        print(u"{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
         last_node.is_exit_node = True
 
         # If the last node's last statement is a goto not going towards eof, then
@@ -237,7 +237,7 @@ class CallGraph:
             all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
             destinations = set(c.dst for c in all_connections)
             if "eof" not in destinations:
-                print("Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
+                print(u"Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
                 del call_graph.nodes["eof"]
 
         # Find and mark the "nested" connections.
@@ -250,7 +250,7 @@ class CallGraph:
             # Special case: the previous node has no code or all lines are comments / empty lines.
             all_noop = all(line.noop for line in prev_node.code)
             if not prev_node.code or all_noop:
-                print("Adding nested connection between {0} and {1} because all_noop ({2}) or empty code ({3})".format(
+                print(u"Adding nested connection between {0} and {1} because all_noop ({2}) or empty code ({3})".format(
                     prev_node.name, cur_node.name, all_noop, not prev_node.code), file=log_file)
                 prev_node.AddConnection(cur_node.name, "nested")
                 break
@@ -267,7 +267,7 @@ class CallGraph:
                 
                 commands = set(c.command for c in line.commands)
                 if "exit" not in commands and "goto" not in commands:
-                    print("Adding nested connection between {0} and {1} because there is a non-exit or non-goto command.".format(
+                    print(u"Adding nested connection between {0} and {1} because there is a non-exit or non-goto command.".format(
                         prev_node.name, cur_node.name), file=log_file)
                     prev_node.AddConnection(cur_node.name, "nested")
 
