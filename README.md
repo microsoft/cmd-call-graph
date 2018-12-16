@@ -44,7 +44,7 @@ This script would generate the following graph:
 
 ![call graph](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-noshowall.png)
 
-If the `--show-all-calls` option is set to `True`, then the following graph would be generated:
+If the `--show-all-calls` option is enabled, then the following graph would be generated:
 
 ![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
 

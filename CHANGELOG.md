@@ -8,12 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added a Chengelog, that retroactively covers all versions.
+- Added a Changelog, that retroactively covers all versions.
 
 ### Fixed
 
 - Issue #15 (Fix handling of nodes with %)
 - Issue #17 (Create a ChangeLog)
+
+### Changed
+
+- Changed the command-line options --show-all-calls and --show-node-stats to
+  not require =True from the command line (Issue #18)
 
 ## [0.4] - 2018-12-12
 

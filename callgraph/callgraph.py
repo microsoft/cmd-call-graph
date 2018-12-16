@@ -320,12 +320,12 @@ class CallGraph:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--show-all-calls", type=bool,
-                        help="Set to true to show all calls in the graph.", default=False,
-                        dest="allcalls")
-    parser.add_argument("--show-node-stats", type=bool,
+    parser.add_argument("--show-all-calls",
+                        help="Set to true to show all calls in the graph.",
+                        dest="allcalls", action="store_true")
+    parser.add_argument("--show-node-stats",
                         help="Set to true to show statistics about the nodes in the graph.",
-                        default=False, dest="nodestats")
+                        dest="nodestats", action="store_true")
     parser.add_argument("--nodes-to-hide", type=str, nargs="+", dest="nodestohide",
                         help="List of space-separated nodes to hide.")
     args = parser.parse_args()
