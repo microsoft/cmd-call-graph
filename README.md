@@ -11,19 +11,35 @@ The tool is available on PyPI: https://pypi.org/project/cmd-call-graph/
 It takes the input file as stdin and outputs the resulting file to stdout,
 outputting logs and errors to stderr.
 
-Usage example from WSL (Windows Subsystem for Linux):
+## Usage Examples
 
+Usage example for Ubuntu Linux and WSL (Windows Subsystem for Linux), assumes
+Python and `pip` are installed:
+
+```bash
     $ pip install cmd-call-graph
     $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
+```
 
 The resulting `dot` file can be rendered with any `dot` renderer. Example with
-graphviz:
+graphviz (`VIEWER` could be `explorer.exe` under Windows:
 
+```bash
     $ sudo apt install graphviz
     $ dot -Tpng your-file-call-graph.dot > your-file-call-graph.png
-    $ explorer.exe your-file-call-graph.png
+    $ $VIEWER your-file-call-graph.png
+```
 
-## Example
+Example with PowerShell:
+
+```powershell
+    PS C:\> choco install graphviz python3 pip
+    PS C:\> cmd-call-graph.exe -i your-file.cmd -o your-file-call-graph.dot
+    PS C:\> dot.exe -Tpng your-file-call-graph.dot
+    PS C:\> explorer.exe your-file-call-graph.dot.png
+```
+
+## Output Examples
 
 Here is an example CMD script:
 
