@@ -1,7 +1,9 @@
+from os import path
 from setuptools import setup
 
-with open("README.md", "rb") as readme:
-    long_description = readme.read().decode("utf-8")
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, "README.md"), encoding="utf-8") as readme:
+    long_description = readme.read()
 
 setup(
     name="cmd-call-graph",
@@ -9,10 +11,11 @@ setup(
     entry_points={
         "console_scripts": ["cmd-call-graph = callgraph.callgraph:main"]
     },
-    version=0.4,
+    version="0.4",
     author="Andrea Spadaccini",
     author_email="andrea.spadaccini@gmail.com",
     description="A simple tool to generate a call graph for calls within Windows CMD (batch) files.",
+    license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Microsoft/cmd-call-graph",
