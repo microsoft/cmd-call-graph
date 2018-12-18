@@ -1,11 +1,11 @@
 digraph g {
-"five" [label=<<b>five</b><br/>(line 11)<br/><sub>[5 LOC]</sub><br/><sub>[2 external calls]</sub>>,color=red,penwidth=2]
+"five" [color="#e6e6e6",style=filled,label=<<b>five</b><br/>(line 11)<br/><sub>[5 LOC]</sub><br/><sub>[2 external calls]</sub><br/><sub>[terminating]</sub>>]
 "four" [label=<<b>four</b><br/>(line 7)<br/><sub>[4 LOC]</sub><br/><sub>[1 external call]</sub>>]
-"four" -> "five" [label=nested,color=blue3]
+"four" -> "five" [label=" nested",color="#107c10"]
 "one" [label=<<b>one</b><br/>(line 1)<br/><sub>[1 LOC]</sub>>]
-"one" -> "two" [label=nested,color=blue3]
+"one" -> "two" [label=" nested",color="#107c10"]
 "three" [label=<<b>three</b><br/>(line 4)<br/><sub>[3 LOC]</sub>>]
-"three" -> "four" [label=nested,color=blue3]
+"three" -> "four" [label=" nested",color="#107c10"]
 "two" [label=<<b>two</b><br/>(line 2)<br/><sub>[2 LOC]</sub>>]
-"two" -> "three" [label=nested,color=blue3]
+"two" -> "three" [label=" nested",color="#107c10"]
 }
