@@ -2,9 +2,8 @@ import io
 import os
 import unittest
 
-from callgraph import callgraph
-CodeLine = callgraph.CodeLine
-Command = callgraph.Command
+from callgraph.core import CallGraph, CodeLine, Command
+
 
 class CodeLineTest(unittest.TestCase):
     def test_command_counters(self):
@@ -30,7 +29,7 @@ class ParseSourceTests(CallGraphTest):
         do something else
         exit
         """.split("\n")
-        call_graph = callgraph.CallGraph._ParseSource(code, self.devnull)
+        call_graph = CallGraph._ParseSource(code, self.devnull)
         self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         
@@ -44,7 +43,7 @@ class ParseSourceTests(CallGraphTest):
         :foo
         exit
         """.split("\n")
-        call_graph = callgraph.CallGraph._ParseSource(code, self.devnull)
+        call_graph = CallGraph._ParseSource(code, self.devnull)
         self.assertEqual(3, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         self.assertIn("foo", call_graph.nodes.keys())
@@ -66,7 +65,7 @@ class ParseSourceTests(CallGraphTest):
         :foo
         exit
         """.split("\n")
-        call_graph = callgraph.CallGraph._ParseSource(code, self.devnull)
+        call_graph = CallGraph._ParseSource(code, self.devnull)
         self.assertEqual(3, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         self.assertIn("foo", call_graph.nodes.keys())
@@ -85,12 +84,12 @@ class ParseSourceTests(CallGraphTest):
 
 class BasicBuildTests(CallGraphTest):
     def test_empty(self):
-        call_graph = callgraph.CallGraph.Build("", self.devnull)
+        call_graph = CallGraph.Build("", self.devnull)
         self.assertEqual(1, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
 
     def test_eof_defined_once(self):
-        call_graph = callgraph.CallGraph.Build([":eof"], self.devnull)
+        call_graph = CallGraph.Build([":eof"], self.devnull)
         self.assertEqual(1, len(call_graph.nodes))
         self.assertIn("eof", call_graph.nodes.keys())
     
@@ -102,7 +101,7 @@ class BasicBuildTests(CallGraphTest):
         goto :eof
         """.split("\n")
 
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertEqual(3, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         self.assertIn("foo", call_graph.nodes.keys())
@@ -120,7 +119,7 @@ class BasicBuildTests(CallGraphTest):
         code = """
         goto :nonexisting
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertEqual(1, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         begin_node = call_graph.nodes["__begin__"]
@@ -134,7 +133,7 @@ class BasicBuildTests(CallGraphTest):
         exit
         """.split("\n")
 
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("foo", call_graph.nodes.keys())
 
@@ -152,7 +151,7 @@ class BasicBuildTests(CallGraphTest):
         something
         """.split("\n")
 
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("foo", call_graph.nodes.keys())
 
@@ -169,7 +168,7 @@ class BasicBuildTests(CallGraphTest):
         :bar
         goto :foo
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertIn("bar", call_graph.nodes.keys())
         bar_node = call_graph.nodes["bar"]
         self.assertFalse(bar_node.is_exit_node)
@@ -179,7 +178,7 @@ class BasicBuildTests(CallGraphTest):
         :foo
         goto :eof
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertIn("foo", call_graph.nodes.keys())
         foo_node = call_graph.nodes["foo"]
         self.assertTrue(foo_node.is_exit_node)
@@ -192,7 +191,7 @@ class BasicBuildTests(CallGraphTest):
         :bar
         something
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("bar", call_graph.nodes.keys())
 
@@ -207,7 +206,7 @@ class BasicBuildTests(CallGraphTest):
         goto :eof
         :foo
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         begin_node = call_graph.nodes["__begin__"]
         self.assertEqual(1, len(begin_node.connections))
         connection = begin_node.connections.pop()
@@ -220,7 +219,7 @@ class BasicBuildTests(CallGraphTest):
         :foo
         goto :eof
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         begin = call_graph.nodes["__begin__"]
         foo = call_graph.nodes["foo"]
         self.assertEqual(begin.code, [
@@ -239,7 +238,7 @@ class BasicBuildTests(CallGraphTest):
         code = """
         :foo
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         begin = call_graph.nodes["__begin__"]
 
         self.assertEqual(1, len(begin.connections), begin.code)
@@ -249,89 +248,12 @@ class BasicBuildTests(CallGraphTest):
         code = """:foo
         :bar
         """.split("\n")
-        call_graph = callgraph.CallGraph.Build(code, self.devnull)
+        call_graph = CallGraph.Build(code, self.devnull)
         begin = call_graph.nodes["foo"]
 
         self.assertEqual(1, len(begin.connections))
         self.assertEqual("nested", begin.connections.pop().kind)
     
-# The code contains a double call to the same label (foo).
-# If allgraph is set to False, it should count as a single call,
-# and no line annotations should appear in the graph,
-# while if it's set to True it should count as a double call.
-class PrintOptionsGraphTest(CallGraphTest):
-    def setUp(self):
-        CallGraphTest.setUp(self)
-        code = """
-        call :foo
-        call :foo
-        call powershell.exe something.ps1
-        call powershell.exe something.ps1
-        exit
-        :foo
-        call powershell.exe something.ps1
-        goto :%command%
-        goto :eof
-        """.split("\n")
-
-        self.call_graph = callgraph.CallGraph.Build(code, self.devnull)
-        begin = self.call_graph.nodes["__begin__"]
-
-        # There should only be two connections of type call in __begin__.
-        self.assertEqual(2, len(begin.connections))
-        kinds = set(c.kind for c in begin.connections)
-        self.assertEqual(1, len(kinds))
-        self.assertEqual("call", kinds.pop())
-
-    def test_duplicate_no_allgraph(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, show_all_calls=False, log_file=self.devnull)
-        dot = f.getvalue()
-        self.assertEqual(1, dot.count('"__begin__" -> "foo"'), "No connection found in the dot document: " + dot)
-
-        # Test that no connections have line number annotations,
-        # since connections are de-duplicated by line.
-        self.assertEqual(0, dot.count("line 2"))
-        self.assertEqual(0, dot.count("line 3"))
-
-    def test_loc(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, show_node_stats=True, log_file=self.devnull)
-        dot = f.getvalue()
-
-        # Check the number of lines of code.
-        self.assertEqual(1, dot.count('5 LOC'))
-        self.assertEqual(1, dot.count('6 LOC'))
-
-    def test_external_call(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, show_node_stats=True, log_file=self.devnull)
-        dot = f.getvalue()
-
-        self.assertEqual(1, dot.count('2 external calls]'))
-        self.assertEqual(1, dot.count('1 external call]'))
-
-    def test_duplicate_allgraph(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, show_all_calls=True, log_file=self.devnull)
-        dot = f.getvalue()
-        self.assertEqual(2, dot.count('"__begin__" -> "foo"'))
-
-        # Test that connections do have line number annotations.
-        self.assertEqual(1, dot.count("line 2"))
-        self.assertEqual(1, dot.count("line 3"))
-    
-    def test_hide_eof(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, log_file=self.devnull, nodes_to_hide=set(["eof"]))
-        dot = f.getvalue()
-        self.assertEqual(0, dot.count("eof"))
-    
-    def test_percent(self):
-        f = io.StringIO()
-        self.call_graph.PrintDot(f, log_file=self.devnull)
-        dot = f.getvalue()
-        self.assertEqual(1, dot.count(r"\%command\%"), dot)
 
 if __name__ == "__main__":
     unittest.main()
