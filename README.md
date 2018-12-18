@@ -124,7 +124,7 @@ Here is what each color means in the graph:
 
  * Orange: `goto` connection;
  * Blue: `call` connection;
- * Greeen: `nested` connection;
+ * Teal: `nested` connection;
  * Light gray: background for terminating nodes
 
 ## Why?
