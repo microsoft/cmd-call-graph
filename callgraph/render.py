@@ -10,7 +10,7 @@ def _Escape(input_string):
 
 COLORS = {
     'goto':         '"#d83b01"', # Orange
-    'nested':       '"#107c10"', # Green
+    'nested':       '"#008575"', # Teal
     'call':         '"#0078d4"', # Blue
     'terminating':  '"#e6e6e6"', # Light gray
 }
