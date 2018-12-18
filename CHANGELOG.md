@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project uses [Semantic Versioning](https://semver.org) starting from version
 1.0.0.
 
+## [unreleased]
+
+## Changed
+
+- Changed color palette to be more muted, and do not rely on color alone to convey
+  information (fixes Issue #14)
+
 ## [1.0.0] - 2018-12-17
 
 ### Added
