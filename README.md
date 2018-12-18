@@ -64,6 +64,68 @@ If the `--show-all-calls` option is enabled, then the following graph would be g
 
 ![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
 
+## Types of entities represented
+
+The script analyzes CMD scripts, and represents each block of text under a given label as a *node* in
+the call graph.
+
+### Node properties
+
+Each node always contains the line number where it starts, except if the node is never defined in the code,
+which can happen in case of programming errors, dynamic node names (e.g., `%command%`) and the `eof` pseudo-node.
+
+If a node causes the program to exit, it is marked as `terminating`.
+
+If `--show-node-stats` is set, extra stats about each node are displayed, if present:
+
+* number of lines of code (`LOC`);
+* number of external calls.
+
+### Special nodes
+
+There are 2 special nodes:
+
+* `_begin_` is a pseudo-node inserted at the start of each call graph, which represents the start of the
+  script, which is by definition without a label;
+* `eof`, which may or may not be a pseudo-node. In CMD, `eof` is a special node that is used as target
+  of `goto` to indicate that the current "subroutine" should terminate, or the whole program should
+  terminate if the call stack is empty.
+
+### Types of connections
+
+ * `goto`: if an edge of type `goto` goes from `A` to `B`, it means that in the code within the label `A`
+   there is an instruction in the form `goto :B`.
+ * `call`: if an edge of type `call` goes from `A` to `B`, it means that in the code within the label `A`
+   there is an instruction in the form `call :B`.
+ * `nested`: if an edge of type `nested` goes from `A` to `B`, it means that in the code within the label `A`
+   ends directly where `B` starts, and there is no `goto` or `exit` statement at the end of `A` which would
+   prevent the execution from not going into `B` as `A` ends.
+
+Example of a `nested` connection:
+
+```
+A:
+  echo "foo"
+  echo "bar"
+B:
+  echo "baz"
+```
+
+The above code would lead to a `nested` connection between `A` and `B`.
+
+## Legend for Output Graphs
+
+The graphs are self-explanatory: all information is codified with descriptive labels, and there is no
+information conveyed only with color or other types of non-text graphical hint.
+
+Colors are used to make the graph easier to follow, but no information is conveyed only with color.
+
+Here is what each color means in the graph:
+
+ * Orange: `goto` connection;
+ * Blue: `call` connection;
+ * Greeen: `nested` connection;
+ * Light gray: background for terminating nodes
 
 ## Why?
 Sometimes legacy code bases may contain old CMD files. This tool allows to
