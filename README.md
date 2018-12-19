@@ -64,6 +64,10 @@ If the `--show-all-calls` option is enabled, then the following graph would be g
 
 ![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
 
+If both the `--show-all-calls` and `--show-node-stats` options are enabled:
+
+![call graph showall showstats](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-nodestats.png)
+
 ## Types of entities represented
 
 The script analyzes CMD scripts, and represents each block of text under a given label as a *node* in

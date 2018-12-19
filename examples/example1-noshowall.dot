@@ -8,6 +8,6 @@ digraph g {
 "baz" [label=<<b>baz</b><br/>(line 8)>]
 "baz" -> "foo" [label=" nested",color="#008575"]
 "eof" [color="#e6e6e6",style=filled,label=<<b>eof</b><br/><sub>[terminating]</sub>>]
-"foo" [label=<<b>foo</b><br/>(line 11)>]
+"foo" [label=<<b>foo</b><br/>(line 12)>]
 "foo" -> "bar" [label=" goto",color="#d83b01"]
 }

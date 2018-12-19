@@ -7,6 +7,7 @@ goto :eof
     call :baz
 :baz
     echo "in baz"
+    call powershell.exe Write-Host "Hello World from PowerShell"
 
 :foo
     echo "In foo"
