@@ -8,36 +8,8 @@ A simple tool to generate a call graph for calls within Windows CMD (batch) file
 
 The tool is available on PyPI: https://pypi.org/project/cmd-call-graph/
 
-It takes the input file as stdin and outputs the resulting file to stdout,
-outputting logs and errors to stderr.
-
-## Invocation Examples
-
-Invocation example for Ubuntu Linux and WSL (Windows Subsystem for Linux), assumes
-Python and `pip` are installed:
-
-```bash
-    $ pip install cmd-call-graph
-    $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
-```
-
-The resulting `dot` file can be rendered with any `dot` renderer. Example with
-graphviz (`VIEWER` could be `explorer.exe` under Windows:
-
-```bash
-    $ sudo apt install graphviz
-    $ dot -Tpng your-file-call-graph.dot > your-file-call-graph.png
-    $ $VIEWER your-file-call-graph.png
-```
-
-Example with PowerShell:
-
-```powershell
-    PS C:\> choco install graphviz python3 pip
-    PS C:\> cmd-call-graph.exe -i your-file.cmd -o your-file-call-graph.dot
-    PS C:\> dot.exe -Tpng your-file-call-graph.dot
-    PS C:\> explorer.exe your-file-call-graph.dot.png
-```
+By default, it takes the input file as stdin and outputs the resulting file
+to stdout, outputting logs and errors to stderr.
 
 ## Output Examples
 
@@ -67,6 +39,34 @@ If the `--show-all-calls` option is enabled, then the following graph would be g
 If both the `--show-all-calls` and `--show-node-stats` options are enabled:
 
 ![call graph showall showstats](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-nodestats.png)
+
+## Invocation Examples
+
+Invocation example for Ubuntu Linux and WSL (Windows Subsystem for Linux), assumes
+Python and `pip` are installed:
+
+```bash
+    $ pip install cmd-call-graph
+    $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
+```
+
+The resulting `dot` file can be rendered with any `dot` renderer. Example with
+graphviz (`VIEWER` could be `explorer.exe` under Windows:
+
+```bash
+    $ sudo apt install graphviz
+    $ dot -Tpng your-file-call-graph.dot > your-file-call-graph.png
+    $ $VIEWER your-file-call-graph.png
+```
+
+Example with PowerShell:
+
+```powershell
+    PS C:\> choco install graphviz python3 pip
+    PS C:\> cmd-call-graph.exe -i your-file.cmd -o your-file-call-graph.dot
+    PS C:\> dot.exe -Tpng your-file-call-graph.dot
+    PS C:\> explorer.exe your-file-call-graph.dot.png
+```
 
 ## Types of entities represented
 
