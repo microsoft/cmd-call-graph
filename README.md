@@ -13,20 +13,24 @@ to stdout, outputting logs and errors to stderr.
 
 ## Output Examples
 
-Here is an example CMD script:
+Given the following CMD script:
 
-    @echo off
-    call :foo
-    goto :eof
-    :bar
-        echo "in bar"
-        call :baz
-        call :baz
-    :baz
-        echo "in baz"
-    :foo
-        echo "In foo"
-        goto :bar
+```
+@echo off
+call :foo
+goto :eof
+:bar
+    echo "in bar"
+    call :baz
+    call :baz
+:baz
+    echo "in baz"
+    call powershell.exe Write-Host "Hello World from PowerShell"
+
+:foo
+    echo "In foo"
+    goto :bar
+```
 
 This script would generate the following graph:
 
