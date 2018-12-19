@@ -1,4 +1,8 @@
 language: python
+addons:
+  apt:
+    packages:
+      - graphviz
 python:
   - "2.7"
   - "3.3"
@@ -7,3 +11,4 @@ python:
   - "3.6"
 script:
   - python -m unittest discover
+  - bash scripts/generate-examples.sh
