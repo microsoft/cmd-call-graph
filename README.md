@@ -68,7 +68,7 @@ Example with PowerShell:
 ```powershell
     PS C:\> choco install graphviz python3 pip
     PS C:\> cmd-call-graph.exe -i your-file.cmd -o your-file-call-graph.dot
-    PS C:\> dot.exe -Tpng your-file-call-graph.dot
+    PS C:\> dot.exe -Tpng your-file-call-graph.dot -O
     PS C:\> explorer.exe your-file-call-graph.dot.png
 ```
 
