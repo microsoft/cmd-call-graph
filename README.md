@@ -11,9 +11,9 @@ The tool is available on PyPI: https://pypi.org/project/cmd-call-graph/
 It takes the input file as stdin and outputs the resulting file to stdout,
 outputting logs and errors to stderr.
 
-## Usage Examples
+## Invocation Examples
 
-Usage example for Ubuntu Linux and WSL (Windows Subsystem for Linux), assumes
+Invocation example for Ubuntu Linux and WSL (Windows Subsystem for Linux), assumes
 Python and `pip` are installed:
 
 ```bash
@@ -112,6 +112,18 @@ B:
 ```
 
 The above code would lead to a `nested` connection between `A` and `B`.
+
+## Command-line options
+
+* `--show-all-calls`: create one edge for each individual `call`/`goto`, rather than just one for each type
+  of connections (which is the default). Leads to a busier but more accurate graph;
+* `--show-node-stats`: augments each node in the graph with additional information about the node (i.e., number
+  of lines of code, number of external calls);
+* `--nodes-to-hide`: hides the list of nodes passed as a space-separated list after this parameter.
+* `-v` or `--verbose`: enable debug output, which will be sent to the log file;
+* `-l` or `--log-file`: name of the log file. If not specified, the standard error file is used;
+* `-i` or `--input`: name of the input file. If not specified, the standard input file is used;
+* `-o` or `--output`: name of the output file. If not specified, the standard output file is used.
 
 ## Legend for Output Graphs
 
