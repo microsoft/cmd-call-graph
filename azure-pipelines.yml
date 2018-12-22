@@ -32,7 +32,23 @@ jobs:
   - script: python -m unittest discover
     displayName: 'Unit Tests'
 
-- job: 'Publish'
+- job: 'Generate sample images'
+  dependsOn: 'Test'
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      architecture: 'x64'
+
+  - script: 
+    - sudo apt-get install graphviz
+    - bash scripts/generate-examples.sh
+    displayName: 'Generate sample images'
+
+- job: 'Build'
   dependsOn: 'Test'
   pool:
     vmImage: 'Ubuntu-16.04'
