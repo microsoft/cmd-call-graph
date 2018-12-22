@@ -43,9 +43,9 @@ jobs:
       versionSpec: '3.x'
       architecture: 'x64'
 
-  - script: 
-    - sudo apt-get install graphviz
-    - bash scripts/generate-examples.sh
+  - script: |
+      sudo apt-get install graphviz
+      bash scripts/generate-examples.sh
     displayName: 'Generate sample images'
 
 - job: 'Build'
