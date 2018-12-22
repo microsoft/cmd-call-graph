@@ -32,7 +32,7 @@ jobs:
   - script: python -m unittest discover
     displayName: 'Unit Tests'
 
-- job: 'Generate sample images'
+- job: 'GenerateSamples'
   dependsOn: 'Test'
   pool:
     vmImage: 'Ubuntu-16.04'
