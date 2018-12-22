@@ -1,5 +1,6 @@
 # cmd-call-graph
 
+[![Build Status](https://dev.azure.com/cmd-call-graph/cmd-call-graph/_apis/build/status/Microsoft.cmd-call-graph?branchName=master)](https://dev.azure.com/cmd-call-graph/cmd-call-graph/_build/latest?definitionId=1?branchName=master)
 [![Build Status](https://api.travis-ci.org/Microsoft/cmd-call-graph.svg?branch=master)](http://travis-ci.org/Microsoft/cmd-call-graph)
 [![PyPI](https://img.shields.io/pypi/v/cmd-call-graph.svg)](https://pypi.org/project/cmd-call-graph/)
 
