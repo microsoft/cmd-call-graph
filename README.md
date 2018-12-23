@@ -165,6 +165,13 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Unit tests
-Run unit tests from the project root by running:
+Run unit tests from the project root either with the built-in `unittest` module:
 
     python -m unittest discover
+
+Or by using `pytests`, which can produce reports both for unit test success and for code coverage, by
+using the following invocation:
+
+    pip install pytest
+    pip install pytest-cov
+    pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=callgraph --cov-report=xml --cov-report=html
