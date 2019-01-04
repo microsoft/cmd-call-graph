@@ -40,6 +40,7 @@ class Node:
         self.line_number = NO_LINE_NUMBER
         self.original_name = name
         self.is_exit_node = False
+        self.is_last_node = False
         self.code = []
         self.loc = 0
 
@@ -148,6 +149,7 @@ class CallGraph:
         last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
         print(u"{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
         last_node.is_exit_node = True
+        last_node.is_last_node = True
 
         # If the last node's last statement is a goto not going towards eof, then
         # it's not an exit node.

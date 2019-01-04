@@ -110,10 +110,14 @@ class BasicBuildTests(CallGraphTest):
         begin = call_graph.nodes["__begin__"]
         self.assertTrue(begin.is_exit_node)
         self.assertEqual(1, len(begin.connections))
+        self.assertFalse(begin.is_last_node)
 
         connection = begin.connections.pop()
         self.assertEqual("call", connection.kind)
         self.assertEqual("foo", connection.dst)
+
+        foo = call_graph.nodes["foo"]
+        self.assertTrue(foo.is_last_node)
 
     def test_handle_nonexisting_target(self):
         code = """
@@ -142,6 +146,9 @@ class BasicBuildTests(CallGraphTest):
 
         self.assertTrue(foo_node.is_exit_node)
         self.assertFalse(begin_node.is_exit_node)
+
+        self.assertTrue(foo_node.is_last_node)
+        self.assertFalse(begin_node.is_last_node)
 
     def test_simple_terminating(self):
         code = """
@@ -182,8 +189,6 @@ class BasicBuildTests(CallGraphTest):
         self.assertIn("foo", call_graph.nodes.keys())
         foo_node = call_graph.nodes["foo"]
         self.assertTrue(foo_node.is_exit_node)
-
-
 
     def test_simple_nested(self):
         code = """
@@ -253,6 +258,15 @@ class BasicBuildTests(CallGraphTest):
 
         self.assertEqual(1, len(begin.connections))
         self.assertEqual("nested", begin.connections.pop().kind)
+        self.assertFalse(begin.is_exit_node)
+        self.assertFalse(begin.is_last_node)
+
+        bar = call_graph.nodes["bar"]
+        self.assertTrue(bar.is_exit_node)
+        self.assertTrue(bar.is_last_node)
+
+        # There should be no __begin__ node, only foo and bar.
+        self.assertEqual(2, len(call_graph.nodes))
     
 
 if __name__ == "__main__":
