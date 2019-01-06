@@ -284,6 +284,23 @@ class BasicBuildTests(CallGraphTest):
         self.assertTrue(eof.is_exit_node)
         self.assertTrue(eof.is_last_node)
     
+    def test_multiple_exit_nodes(self):
+        code = """
+        exit
+        :foo
+        exit
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        self.assertEqual(2, len(call_graph.nodes))
+
+        begin = call_graph.nodes["__begin__"]
+        self.assertTrue(begin.is_exit_node)
+        self.assertFalse(begin.is_last_node)
+
+        foo = call_graph.nodes["foo"]
+        self.assertTrue(foo.is_exit_node)
+        self.assertTrue(foo.is_last_node)
+    
 
 if __name__ == "__main__":
     unittest.main()
