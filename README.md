@@ -98,6 +98,11 @@ There are 2 special nodes:
   of `goto` to indicate that the current "subroutine" should terminate, or the whole program should
   terminate if the call stack is empty.
 
+The `eof` node is automatically removed if it's a pseudo-node and it's not reached via `call` or `nested`
+connections.
+
+The `_begin_` pseudo-node is removed if there is another node starting at line 1.
+
 ### Types of connections
 
  * `goto`: if an edge of type `goto` goes from `A` to `B`, it means that in the code within the label `A`
