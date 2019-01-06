@@ -83,11 +83,22 @@ class CallGraph:
         return node
 
     def _MarkExitNodes(self):
-        # Algorithm:
-        # visit all nodes via goto or nested connections, starting from __begin__
-        # mark the node as exit nodes if it contains 
+        # A node is an exit node if:
+        # 1. it contains an "exit" command with no target
+        # or
+        # 2. it's reached from the starting node via "goto" or "nested" connections
+        #    and it contains an exit command or a "goto eof" command.
+
+        # Identify all nodes with an exit command with no targets.
+        for node in self.nodes.values():
+            all_commands = set(itertools.chain.from_iterable(line.commands for line in node.code))
+            exit_cmd = Command("exit", "")
+            if exit_cmd in all_commands:
+                node.is_exit_node = True
+
+        # Visit the call graph to find nodes satisfying condition #2.
         q = [self.first_node]
-        visited = set()
+        visited = set()     # Used to avoid loops, since the call graph is not acyclic.
 
         while q:
             cur = q.pop()
@@ -99,7 +110,7 @@ class CallGraph:
             else:
                 all_commands = itertools.chain.from_iterable(line.commands for line in cur.code)
                 for command in all_commands:
-                    if command[0] == "exit" and command[1] == "" or command[0] == "goto" and command[1] == "eof":
+                    if command[0] == "exit" or (command[0] == "goto" and command[1] == "eof"):
                         cur.is_exit_node = True
                         break
 
@@ -166,11 +177,6 @@ class CallGraph:
 
                 if command == "exit" and target == "":
                     line.terminating = True
-
-                    # Note that exit node detection is implemented in _MarkExitNodes, but that algorithm only
-                    # follows "nested" and "goto" nodes, therefore we need to mark nodes that contain naked
-                    # "exit" statements here, since they are terminating even when reached via "call" statements.
-                    node.is_exit_node = True
     
     @staticmethod
     def Build(input_file, log_file=sys.stderr):
