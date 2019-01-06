@@ -40,6 +40,7 @@ class Node:
         self.line_number = NO_LINE_NUMBER
         self.original_name = name
         self.is_exit_node = False
+        self.is_last_node = False
         self.code = []
         self.loc = 0
 
@@ -71,6 +72,7 @@ class CallGraph:
     def __init__(self, log_file=sys.stderr):
         self.nodes = {}
         self.log_file = log_file
+        self.first_node = None
     
     def GetOrCreateNode(self, name):
         if name in self.nodes:
@@ -79,6 +81,45 @@ class CallGraph:
         node = Node(name)
         self.nodes[name] = node
         return node
+
+    def _MarkExitNodes(self):
+        # A node is an exit node if:
+        # 1. it contains an "exit" command with no target
+        # or
+        # 2. it's reached from the starting node via "goto" or "nested" connections
+        #    and it contains an exit command or a "goto eof" command.
+
+        # Identify all nodes with an exit command with no targets.
+        for node in self.nodes.values():
+            all_commands = set(itertools.chain.from_iterable(line.commands for line in node.code))
+            exit_cmd = Command("exit", "")
+            if exit_cmd in all_commands:
+                node.is_exit_node = True
+
+        # Visit the call graph to find nodes satisfying condition #2.
+        q = [self.first_node]
+        visited = set()     # Used to avoid loops, since the call graph is not acyclic.
+
+        while q:
+            cur = q.pop()
+            visited.add(cur.name)
+
+            # Evaluate condition for marking exit node.
+            if cur.is_last_node:
+                cur.is_exit_node = True
+            else:
+                all_commands = itertools.chain.from_iterable(line.commands for line in cur.code)
+                for command in all_commands:
+                    if command[0] == "exit" or (command[0] == "goto" and command[1] == "eof"):
+                        cur.is_exit_node = True
+                        break
+
+            for connection in cur.connections:
+                if connection.dst not in self.nodes or connection.dst in visited:
+                    continue
+                if connection.kind == "nested" or connection.kind == "goto":
+                    q.append(self.nodes[connection.dst])
+            
 
     # Adds to each node information depending on the contents of the code, such as connections
     # deriving from goto/call commands and whether the node is terminating or not.
@@ -136,7 +177,6 @@ class CallGraph:
 
                 if command == "exit" and target == "":
                     line.terminating = True
-                    node.is_exit_node = True
     
     @staticmethod
     def Build(input_file, log_file=sys.stderr):
@@ -144,30 +184,22 @@ class CallGraph:
         for node in call_graph.nodes.values():
             call_graph._AnnotateNode(node)
         
-        # Find exit nodes.
-        last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
-        print(u"{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
-        last_node.is_exit_node = True
-
-        # If the last node's last statement is a goto not going towards eof, then
-        # it's not an exit node.
-        for line in reversed(last_node.code):
-            if line.noop:
-                continue
-
-            for command, target in line.commands:
-                if command == "goto" and target and target != "eof":
-                    last_node.is_exit_node = False
-                    break
-
-        # Prune away EOF if it is a virtual node (no line number) and there are no connections to it.
+        # Prune away EOF if it is a virtual node (no line number) and there are no call/nested connections to it.
         eof = call_graph.GetOrCreateNode("eof")
-        if eof.line_number == NO_LINE_NUMBER:
-            all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
-            destinations = set(c.dst for c in all_connections)
-            if "eof" not in destinations:
-                print(u"Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
-                del call_graph.nodes["eof"]
+        all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
+        destinations = set((c.dst, c.kind) for c in all_connections)
+        if eof.line_number == NO_LINE_NUMBER and ("eof", "call") not in destinations and ("eof", "nested") not in destinations:
+            print(u"Removing the eof node, since there are no call/nested connections to it and it's not a real node", file=log_file)
+            del call_graph.nodes["eof"]
+            for node in call_graph.nodes.values():
+                eof_connections = [c for c in node.connections if c.dst == "eof"]
+                print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
+                for c in eof_connections:
+                    node.connections.remove(c)
+        
+        # Warn the user if there are goto connections to eof, which will not be executed by CMD.
+        if eof.line_number != NO_LINE_NUMBER and ("eof", "goto") in destinations:
+            print(u"WARNING: there are goto connections to eof, but CMD will not execute that code via goto.", file=log_file)
 
         # Find and mark the "nested" connections.
         nodes = [n for n in call_graph.nodes.values() if n.line_number != NO_LINE_NUMBER]
@@ -202,6 +234,12 @@ class CallGraph:
 
                 break
 
+        # Mark all exit nodes.
+        last_node = max(call_graph.nodes.values(), key=lambda x: x.line_number)
+        print(u"{0} is the last node, marking it as exit node.".format(last_node.name), file=log_file)
+        last_node.is_last_node = True
+        call_graph._MarkExitNodes()
+
         return call_graph
 
     # Creates a call graph from an input file, parsing the file in blocks and creating
@@ -214,6 +252,7 @@ class CallGraph:
         # Special node to signal the start of the script.
         cur_node = call_graph.GetOrCreateNode("__begin__")
         cur_node.line_number = 1
+        call_graph.first_node = cur_node
 
         # Special node used by cmd to signal the end of the script.
         eof = call_graph.GetOrCreateNode("eof")
@@ -240,6 +279,7 @@ class CallGraph:
                     # nodes with the same line number.
                     if line_number == 1:
                         del call_graph.nodes["__begin__"]
+                        call_graph.first_node = next_node
 
                     cur_node = next_node
             
