@@ -1,13 +1,11 @@
 digraph g {
-"__begin__" [label=<<b>__begin__</b><br/>(line 1)>]
-"__begin__" -> "eof" [label=" goto",color="#d83b01"]
+"__begin__" [color="#e6e6e6",style=filled,label=<<b>__begin__</b><br/>(line 1)<br/><sub>[terminating]</sub>>]
 "__begin__" -> "foo" [label=" call",color="#0078d4"]
 "bar" [label=<<b>bar</b><br/>(line 4)>]
 "bar" -> "baz" [label=" call",color="#0078d4"]
 "bar" -> "baz" [label=" nested",color="#008575"]
 "baz" [label=<<b>baz</b><br/>(line 8)>]
 "baz" -> "foo" [label=" nested",color="#008575"]
-"eof" [color="#e6e6e6",style=filled,label=<<b>eof</b><br/><sub>[terminating]</sub>>]
 "foo" [label=<<b>foo</b><br/>(line 12)>]
 "foo" -> "bar" [label=" goto",color="#d83b01"]
 }

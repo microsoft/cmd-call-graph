@@ -180,12 +180,20 @@ class CallGraph:
         
         # Prune away EOF if it is a virtual node (no line number) and there are no call/nested connections to it.
         eof = call_graph.GetOrCreateNode("eof")
-        if eof.line_number == NO_LINE_NUMBER:
-            all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
-            destinations = set(c.dst for c in all_connections)
-            if "eof" not in destinations:
-                print(u"Removing the eof node, since there are no connections to it and it's not a real node", file=log_file)
-                del call_graph.nodes["eof"]
+        all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
+        destinations = set((c.dst, c.kind) for c in all_connections)
+        if eof.line_number == NO_LINE_NUMBER and ("eof", "call") not in destinations and ("eof", "nested") not in destinations:
+            print(u"Removing the eof node, since there are no call/nested connections to it and it's not a real node", file=log_file)
+            del call_graph.nodes["eof"]
+            for node in call_graph.nodes.values():
+                eof_connections = [c for c in node.connections if c.dst == "eof"]
+                print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
+                for c in eof_connections:
+                    node.connections.remove(c)
+        
+        # Warn the user if there are goto connections to eof, which will not be executed by CMD.
+        if eof.line_number != NO_LINE_NUMBER and ("eof", "goto") in destinations:
+            print(u"WARNING: there are goto connections to eof, but CMD will not execute that code via goto.", file=log_file)
 
         # Find and mark the "nested" connections.
         nodes = [n for n in call_graph.nodes.values() if n.line_number != NO_LINE_NUMBER]
