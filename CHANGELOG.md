@@ -9,6 +9,11 @@ This project uses [Semantic Versioning](https://semver.org) starting from versio
 
 ## [unreleased]
 
+## Fixed
+
+- Fixed exit node detection (#13)
+- Fixed eof node pruning
+
 ## Changed
 
 - Changed color palette to be more muted, and do not rely on color alone to convey
