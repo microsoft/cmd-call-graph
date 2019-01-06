@@ -102,10 +102,9 @@ class BasicBuildTests(CallGraphTest):
         """.split("\n")
 
         call_graph = CallGraph.Build(code, self.devnull)
-        self.assertEqual(3, len(call_graph.nodes))
+        self.assertEqual(2, len(call_graph.nodes))
         self.assertIn("__begin__", call_graph.nodes.keys())
         self.assertIn("foo", call_graph.nodes.keys())
-        self.assertIn("eof", call_graph.nodes.keys())
 
         begin = call_graph.nodes["__begin__"]
         self.assertTrue(begin.is_exit_node)
@@ -213,9 +212,7 @@ class BasicBuildTests(CallGraphTest):
         """.split("\n")
         call_graph = CallGraph.Build(code, self.devnull)
         begin_node = call_graph.nodes["__begin__"]
-        self.assertEqual(1, len(begin_node.connections))
-        connection = begin_node.connections.pop()
-        self.assertEqual("goto", connection.kind)
+        self.assertEqual(0, len(begin_node.connections))
 
     def test_code_in_nodes(self):
         code = """
@@ -267,6 +264,25 @@ class BasicBuildTests(CallGraphTest):
 
         # There should be no __begin__ node, only foo and bar.
         self.assertEqual(2, len(call_graph.nodes))
+    
+    def test_call_nested_eof(self):
+        code = """
+        echo "yo"
+        call :eof
+        :eof
+        echo "eof"
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        self.assertEqual(2, len(call_graph.nodes))
+
+        begin = call_graph.nodes["__begin__"]
+        self.assertEqual(2, len(begin.connections))
+        self.assertFalse(begin.is_exit_node)
+        self.assertFalse(begin.is_last_node)
+
+        eof = call_graph.nodes["eof"]
+        self.assertTrue(eof.is_exit_node)
+        self.assertTrue(eof.is_last_node)
     
 
 if __name__ == "__main__":
