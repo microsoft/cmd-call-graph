@@ -54,7 +54,7 @@ $ cmd-call-graph < your-file.cmd > your-file-call-graph.dot 2>log
 ```
 
 The resulting `dot` file can be rendered with any `dot` renderer. Example with
-graphviz (`VIEWER` could be `explorer.exe` under Windows:
+graphviz (`VIEWER` could be `explorer.exe` under Windows):
 
 ```bash
 $ sudo apt install graphviz
