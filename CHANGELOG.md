@@ -9,6 +9,8 @@ This project uses [Semantic Versioning](https://semver.org) starting from versio
 
 ## [unreleased]
 
+## [1.0.1] - 2019-01-09
+
 ## Fixed
 
 - Fixed exit node detection (#13)
