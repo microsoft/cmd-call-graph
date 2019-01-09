@@ -301,6 +301,22 @@ class BasicBuildTests(CallGraphTest):
         self.assertTrue(foo.is_exit_node)
         self.assertTrue(foo.is_last_node)
     
+    def test_no_nested_with_inline_if(self):
+        code = """
+        call :Filenotempty foo
+        echo %ERRORLEVEL%
+        exit
+        :filenotempty 
+        If %~z1 EQU 0 (Exit /B 1) Else (Exit /B 0)
+        :unused
+        echo Will never run.
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        self.assertEqual(3, len(call_graph.nodes))
+
+        file_not_empty = call_graph.nodes["filenotempty"]
+        self.assertEqual(0, len(file_not_empty.connections), file_not_empty.code)
+    
 
 if __name__ == "__main__":
     unittest.main()

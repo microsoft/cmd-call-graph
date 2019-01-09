@@ -23,7 +23,7 @@ class CodeLine:
         self.commands_counter[command.command] += 1
 
     def __repr__(self):
-        return "[{0} (terminating: {1}, noop: {2})] {3}".format(self.number, self.terminating, self.noop, self.text)
+        return "[{0} (terminating: {1}, noop: {2}, commands: {3})] {4}".format(self.number, self.terminating, self.noop, self.commands, self.text)
     
     def __eq__(self, other):
         return other is not None and self.number == other.number and self.text == other.text and self.terminating == other.terminating
@@ -138,6 +138,10 @@ class CallGraph:
                 continue
 
             for i, token in enumerate(tokens):
+                # Remove open/close parenthesis from the start/end of the command, to deal with inline commands
+                # enclosed in parentheses.
+                token = token.lstrip("(").rstrip(")")
+
                 # Comment; stop processing the rest of the line.
                 if token.startswith("::") or token == "rem" or token.startswith("@::") or token == "@rem":
                     line.noop = True
