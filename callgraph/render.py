@@ -53,6 +53,10 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
         attributes.append("label=<{}>".format("<br/>".join(label_lines)))
 
+        # Minimum width and height of each node proportional to the number of lines contained (self.loc)
+        attributes.append("width={}".format(node.node_width))
+        attributes.append("height={}".format(node.node_height))
+
         if attributes:
             print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
 
