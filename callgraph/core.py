@@ -6,6 +6,9 @@ import sys
 
 NO_LINE_NUMBER = -1
 
+NODE_WIDTH_FACTOR = 0.6
+NODE_HEIGHT_FACTOR = 0.4
+
 Command = collections.namedtuple("Command", ["command", "target"])
 
 # Line of code. Not a namedtuple because we need mutability.
@@ -43,13 +46,23 @@ class Node:
         self.is_last_node = False
         self.code = []
         self.loc = 0
+        self.node_width = 0
+        self.node_height = 0
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
+
+    def UpdateWidth(self):
+        self.node_width = self.loc * NODE_WIDTH_FACTOR
+
+    def UpdateHeight(self):
+        self.node_height = self.loc * NODE_HEIGHT_FACTOR
     
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
         self.loc += 1
+        self.UpdateWidth()
+        self.UpdateHeight()
     
     def GetCommandCount(self):
         node_counter = collections.Counter()
