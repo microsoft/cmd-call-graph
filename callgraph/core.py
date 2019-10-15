@@ -10,7 +10,7 @@ NO_LINE_NUMBER = -1
 NODE_WIDTH_FACTOR = 1
 
 # Setting a max width and height in order for dot not to go out of memory
-MAX_NODE_WIDTH = int(round(NODE_WIDTH_FACTOR * 5, 1))
+MAX_NODE_WIDTH = round(NODE_WIDTH_FACTOR * 5, 1)
 
 Command = collections.namedtuple("Command", ["command", "target"])
 

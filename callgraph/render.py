@@ -15,7 +15,7 @@ COLORS = {
     'terminating':  '"#e6e6e6"', # Light gray
 }
 
-def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None):
+def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False):
     # Output the DOT code.
     print(u"digraph g {", file=out_file)
 
@@ -54,8 +54,9 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
         attributes.append("label=<{}>".format("<br/>".join(label_lines)))
 
         # Minimum width and height of each node proportional to the number of lines contained (self.loc)
-        attributes.append("width={}".format(node.node_width))
-        attributes.append("height={}".format(node.node_height))
+        if represent_node_size:
+            attributes.append("width={}".format(node.node_width))
+            attributes.append("height={}".format(node.node_height))
 
         if attributes:
             print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
