@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import sys
-import math
 
 from . import core
 
@@ -33,7 +32,7 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
     print(u"digraph g {", file=out_file)
 
     max_node_loc = 0
-    min_node_loc = math.inf
+    min_node_loc = float("inf")
 
     node_loc_std = 1
 
