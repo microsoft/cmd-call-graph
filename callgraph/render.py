@@ -1,9 +1,13 @@
 from __future__ import print_function
 
 import sys
+import math
 
 from . import core
 
+DEFAULT_MIN_NODE_SIZE = 3
+DEFAULT_MAX_NODE_SIZE = 7
+ 
 def _Escape(input_string):
     return input_string.replace("%", r"\%")
 
@@ -15,9 +19,30 @@ COLORS = {
     'terminating':  '"#e6e6e6"', # Light gray
 }
 
-def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False):
+def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False, min_node_size=DEFAULT_MIN_NODE_SIZE, max_node_size=DEFAULT_MAX_NODE_SIZE):
+    if min_node_size == None:
+        min_node_size = DEFAULT_MIN_NODE_SIZE
+
+    if max_node_size == None:
+        max_node_size = DEFAULT_MAX_NODE_SIZE
+
+    if min_node_size > max_node_size:
+        min_node_size, max_node_size = max_node_size, min_node_size
+    
     # Output the DOT code.
     print(u"digraph g {", file=out_file)
+
+    max_node_loc = 0
+    min_node_loc = math.inf
+
+    node_loc_std = 1
+
+    for node in sorted(call_graph.nodes.values()):
+        if nodes_to_hide and (node.name in nodes_to_hide):
+            continue
+        
+        if node.loc > max_node_loc:
+            max_node_loc = node.loc
 
     for node in sorted(call_graph.nodes.values()):
         if nodes_to_hide and (node.name in nodes_to_hide):
@@ -55,8 +80,10 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
         # Minimum width and height of each node proportional to the number of lines contained (self.loc)
         if represent_node_size:
-            attributes.append("width={}".format(node.node_width))
-            attributes.append("height={}".format(node.node_height))
+            nw = round((node.loc / max_node_loc) * max_node_size + min_node_size, 1) 
+            nh = round(nw / 2, 1)
+            attributes.append("width={}".format(nw))
+            attributes.append("height={}".format(nh))
 
         if attributes:
             print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)

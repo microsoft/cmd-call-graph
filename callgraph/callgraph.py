@@ -30,8 +30,12 @@ def main():
     parser.add_argument("-l", "--log-file", help="Log file. If it's not set, stderr is used.",
                         type=str, dest="logfile")
     parser.add_argument("--represent-node-size",
-                        help="Nodes' size will be proportional to the number of lines they contain",
+                        help="Nodes' size will be proportional to the number of lines they contain.",
                         action="store_true", dest="nodesize")
+    parser.add_argument("--min-node-size", help="Set minimum rendered node size.", 
+                        dest="min_node_size", action="store_const", const=None)
+    parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
+                        dest="max_node_size", action="store_const", const=None)
 
     args = parser.parse_args()
 
@@ -69,7 +73,8 @@ def main():
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
         render.PrintDot(call_graph, output_file, log_file=log_file, show_all_calls=args.allcalls,
-                 show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize)
+                        show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize,
+                        min_node_size=args.min_node_size, max_node_size=args.max_node_size)
     except Exception as e:
         print(u"Error processing the call graph: {}".format(e))
 

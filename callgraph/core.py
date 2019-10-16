@@ -6,12 +6,6 @@ import sys
 
 NO_LINE_NUMBER = -1
 
-# We only need the width factor because height will always be half the width
-NODE_WIDTH_FACTOR = 1
-
-# Setting a max width and height in order for dot not to go out of memory
-MAX_NODE_WIDTH = round(NODE_WIDTH_FACTOR * 5, 1)
-
 Command = collections.namedtuple("Command", ["command", "target"])
 
 # Line of code. Not a namedtuple because we need mutability.
@@ -55,19 +49,10 @@ class Node:
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
 
-    def UpdateSize(self):
-        self.node_width = round(self.loc * NODE_WIDTH_FACTOR, 1)
-        
-        if self.node_width > MAX_NODE_WIDTH:
-            self.node_width = MAX_NODE_WIDTH
-
-        self.node_height = round(self.node_width / 2, 1)
-
     
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
         self.loc += 1
-        self.UpdateSize()
     
     def GetCommandCount(self):
         node_counter = collections.Counter()
