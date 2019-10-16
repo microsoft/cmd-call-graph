@@ -4,5 +4,6 @@
 # (https://en.wikipedia.org/wiki/DOT_(graph_description_language)).
 
 from callgraph.callgraph import main
+
 if __name__ == "__main__":
     main()
