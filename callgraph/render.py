@@ -4,15 +4,16 @@ import sys
 
 from . import core
 
+
 def _Escape(input_string):
     return input_string.replace("%", r"\%")
 
 
 COLORS = {
-    'goto':         '"#d83b01"', # Orange
-    'nested':       '"#008575"', # Teal
-    'call':         '"#0078d4"', # Blue
-    'terminating':  '"#e6e6e6"', # Light gray
+    'goto':         '"#d83b01"',  # Orange
+    'nested':       '"#008575"',  # Teal
+    'call':         '"#0078d4"',  # Blue
+    'terminating':  '"#e6e6e6"',  # Light gray
 }
 
 def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None):
@@ -28,7 +29,7 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
         pretty_name = name
         if node.original_name != "":
             pretty_name = node.original_name
-        
+
         print(u"Processing node {0} (using name: {1})".format(node.name, pretty_name), file=log_file)
 
         attributes = []
@@ -45,7 +46,7 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
             if external_call_count > 0:
                 text = "call" if external_call_count == 1 else "calls"
                 label_lines.append("<sub>[{} external {}]</sub>".format(external_call_count, text))
-            
+
         if node.is_exit_node:
             attributes.append("color={}".format(COLORS["terminating"]))
             attributes.append("style=filled")
@@ -56,11 +57,12 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
         if attributes:
             print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
 
-        # De-duplicate connections by line number if show_all_calls is set to False.
+        # De-duplicate connections by line number if show_all_calls is set to
+        # False.
         connections = node.connections
         if not show_all_calls:
             connections = list(set(core.Connection(c.dst, c.kind, core.NO_LINE_NUMBER) for c in connections))
-        
+
         for c in sorted(connections):
             # Remove EOF connections if necessary.
             if nodes_to_hide and (c.dst in nodes_to_hide):
