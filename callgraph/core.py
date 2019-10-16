@@ -64,7 +64,6 @@ class Node:
         for line in self.code:
             for command, count in line.commands_counter.items():
                 node_counter[command] += count
-
         return node_counter
 
     def __repr__(self):
