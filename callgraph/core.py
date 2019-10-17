@@ -33,8 +33,6 @@ class CodeLine:
 # Connection between two nodes.
 # dst is the name of the target node, kind is the type of connection,
 # line_number is the line where the call/goto happens.
-
-
 Connection = collections.namedtuple("Connection", ["dst", "kind", "line_number"])
 
 # Node in the call graph.
@@ -132,7 +130,6 @@ class CallGraph:
     # contents of the code, such as connections
     # deriving from goto/call commands and
     # whether the node is terminating or not.
-
     def _AnnotateNode(self, node):
         print(u"Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
         for i in range(len(node.code)):
@@ -263,7 +260,7 @@ class CallGraph:
         return call_graph
 
     # Creates a call graph from an input file, parsing the file in blocks and
-    # creating one node for each block. Note that the nodes don't contain any \
+    # creating one node for each block. Note that the nodes don't contain any
     # information that depend on the contents of the node, as this is just the
     # starting point for the processing.
     @staticmethod
