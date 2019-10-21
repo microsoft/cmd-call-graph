@@ -85,8 +85,10 @@ def main():
 
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
-        render.PrintDot(call_graph, min_node_size=args.min_node_size, max_node_size=args.max_node_size,
-                        font_scale_factor=DEFAULT_FONT_SCALE_FACTOR, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls, show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize)
+        render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls,          
+                        show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
+                        min_node_size=args.min_node_size, max_node_size=args.max_node_size, 
+                        font_scale_factor=DEFAULT_FONT_SCALE_FACTOR)
     except Exception as e:
         print(u"Error processing the call graph: {}".format(e))
 
