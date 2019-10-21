@@ -16,12 +16,6 @@ COLORS = {
 }
 
 def PrintDot(call_graph, min_node_size, max_node_size, font_scale_factor, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False):
-    if min_node_size == None:
-        min_node_size = DEFAULT_MIN_NODE_SIZE
-
-    if max_node_size == None:
-        max_node_size = DEFAULT_MAX_NODE_SIZE
-
     if min_node_size > max_node_size:
         min_node_size, max_node_size = max_node_size, min_node_size
 
@@ -35,9 +29,6 @@ def PrintDot(call_graph, min_node_size, max_node_size, font_scale_factor, out_fi
     print(u"digraph g {", file=out_file)
 
     max_node_loc = 0
-    min_node_loc = float("inf")
-
-    node_loc_std = 1
 
     for node in sorted(call_graph.nodes.values()):
         if nodes_to_hide and (node.name in nodes_to_hide):

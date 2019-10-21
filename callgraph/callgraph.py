@@ -79,6 +79,10 @@ def main():
     if args.max_node_size == None:
         args.max_node_size = DEFAULT_MAX_NODE_SIZE
 
+    if args.min_node_size > args.max_node_size:
+        print("Minimum node size should be less than maximum node size")
+        sys.exit(1)
+
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
         render.PrintDot(call_graph, min_node_size=args.min_node_size, max_node_size=args.max_node_size,
