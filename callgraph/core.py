@@ -52,8 +52,8 @@ class Node:
         self.node_height = 0
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
-        self.connections.add(Connection(dst, kind, line_number)
-                             
+        self.connections.add(Connection(dst, kind, line_number))
+
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
         self.loc += 1
