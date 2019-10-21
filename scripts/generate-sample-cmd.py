@@ -23,14 +23,14 @@ code = [u"@echo off", u"call :function0", u"exit /b 0"]
 for function in functions:
     code.append(":{}".format(function))
     loc = random.randint(1, MAX_LENGTH)
-    
+
     for i in range(loc):
         if random.random() < CALL_PROBABILITY:
             target = random.choice(functions)
             code.append(u"  call :{}".format(target))
         else:
             code.append(u"  ; some code goes here.")
-    
+
     if random.random() > NESTED_PROBABILITY:
         code.append(u"exit /b 0")
 
