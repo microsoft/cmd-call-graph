@@ -10,6 +10,9 @@ import sys
 from . import core
 from . import render
 
+DEFAULT_MIN_NODE_SIZE = 3
+DEFAULT_MAX_NODE_SIZE = 7
+DEFAULT_FONT_SCALE_FACTOR = 7
 
 def main():
     parser = argparse.ArgumentParser()
@@ -29,6 +32,13 @@ def main():
                         type=str)
     parser.add_argument("-l", "--log-file", help="Log file. If it's not set, stderr is used.",
                         type=str, dest="logfile")
+    parser.add_argument("--represent-node-size",
+                        help="Nodes' size will be proportional to the number of lines they contain.",
+                        action="store_true", dest="nodesize")
+    parser.add_argument("--min-node-size", help="Set minimum rendered node size.", 
+                        dest="min_node_size", action="store", type=int, default=None)
+    parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
+                        dest="max_node_size", action="store", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -63,10 +73,22 @@ def main():
             print(u"Error opening {}: {}".format(args.output, e), file=sys.stderr)
             sys.exit(1)
 
+    if args.min_node_size == None:
+        args.min_node_size = DEFAULT_MIN_NODE_SIZE
+
+    if args.max_node_size == None:
+        args.max_node_size = DEFAULT_MAX_NODE_SIZE
+
+    if args.min_node_size > args.max_node_size:
+        print("Minimum node size should be less than maximum node size")
+        sys.exit(1)
+
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
-        render.PrintDot(call_graph, output_file, log_file=log_file, show_all_calls=args.allcalls,
-                 show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide)
+        render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls,          
+                        show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
+                        min_node_size=args.min_node_size, max_node_size=args.max_node_size, 
+                        font_scale_factor=DEFAULT_FONT_SCALE_FACTOR)
     except Exception as e:
         print(u"Error processing the call graph: {}".format(e))
 

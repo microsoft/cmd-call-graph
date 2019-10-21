@@ -48,6 +48,8 @@ class Node:
         self.is_last_node = False
         self.code = []
         self.loc = 0
+        self.node_width = 0
+        self.node_height = 0
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
