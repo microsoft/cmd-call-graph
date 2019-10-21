@@ -33,9 +33,9 @@ def main():
                         help="Nodes' size will be proportional to the number of lines they contain.",
                         action="store_true", dest="nodesize")
     parser.add_argument("--min-node-size", help="Set minimum rendered node size.", 
-                        dest="min_node_size", action="store_const", const=None)
+                        dest="min_node_size", action="store", type=int, default=None)
     parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
-                        dest="max_node_size", action="store_const", const=None)
+                        dest="max_node_size", action="store", type=int, default=None)
 
     args = parser.parse_args()
 
