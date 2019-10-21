@@ -85,7 +85,7 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
         # Minimum width and height of each node proportional to the number of lines contained (self.loc)
         if represent_node_size:
-            nw = round((node.loc / max_node_loc) * (max_node_size - 1) + min_node_size, 1) 
+            nw = round((node.loc / max_node_loc) * (max_node_size - min_node_size) + min_node_size, 1) 
             nh = round(nw / 2, 1)
             attributes.append("width={}".format(nw))
             attributes.append("height={}".format(nh))
