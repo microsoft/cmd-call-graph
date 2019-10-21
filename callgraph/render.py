@@ -15,7 +15,7 @@ COLORS = {
     'terminating':  '"#e6e6e6"',  # Light gray
 }
 
-def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=None, max_node_size=None, font_scale_factor=None):
+def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
     if min_node_size > max_node_size:
         min_node_size, max_node_size = max_node_size, min_node_size
 
