@@ -4,11 +4,6 @@ import sys
 
 from . import core
 
-DEFAULT_MIN_NODE_SIZE = 3
-DEFAULT_MAX_NODE_SIZE = 7
-
-FONT_SCALE_FACTOR = 7
-
 def _Escape(input_string):
     return input_string.replace("%", r"\%")
 
@@ -20,7 +15,7 @@ COLORS = {
     'terminating':  '"#e6e6e6"',  # Light gray
 }
 
-def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False, min_node_size=DEFAULT_MIN_NODE_SIZE, max_node_size=DEFAULT_MAX_NODE_SIZE):
+def PrintDot(call_graph, min_node_size, max_node_size, font_scale_factor, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None,represent_node_size=False):
     if min_node_size == None:
         min_node_size = DEFAULT_MIN_NODE_SIZE
 
