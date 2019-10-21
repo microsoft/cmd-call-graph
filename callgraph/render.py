@@ -6,6 +6,8 @@ from . import core
 
 DEFAULT_MIN_NODE_SIZE = 3
 DEFAULT_MAX_NODE_SIZE = 7
+
+FONT_SCALE_FACTOR = 7
  
 def _Escape(input_string):
     return input_string.replace("%", r"\%")
@@ -89,6 +91,9 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
             nh = round(nw / 2, 1)
             attributes.append("width={}".format(nw))
             attributes.append("height={}".format(nh))
+
+            # Font size set to be 7 times node width
+            attributes.append("fontsize={}".format(nw * FONT_SCALE_FACTOR))
 
         if attributes:
             print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
