@@ -88,6 +88,10 @@ def main():
     if args.font_scale_factor == None:
         args.font_scale_factor = DEFAULT_FONT_SCALE_FACTOR
 
+    if args.font_scale_factor < 0:
+        print("Font scale factor should be greater than zero", file=sys.stderr)
+        sys.exit(1)
+
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
         render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls,          
