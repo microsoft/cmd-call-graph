@@ -39,6 +39,8 @@ def main():
                         dest="min_node_size", action="store", type=int, default=None)
     parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
                         dest="max_node_size", action="store", type=int, default=None)
+    parser.add_argument("--font-scale-factor", help="Set the font scale factor", 
+                        dest="font_scale_factor", action="store", type=int, default=None)
 
     args = parser.parse_args()
 
@@ -80,7 +82,14 @@ def main():
         args.max_node_size = DEFAULT_MAX_NODE_SIZE
 
     if args.min_node_size > args.max_node_size:
-        print("Minimum node size should be less than maximum node size")
+        print("Minimum node size should be less than maximum node size", file=sys.stderr)
+        sys.exit(1)
+
+    if args.font_scale_factor == None:
+        args.font_scale_factor = DEFAULT_FONT_SCALE_FACTOR
+
+    if args.font_scale_factor < 0:
+        print("Font scale factor should be greater than zero", file=sys.stderr)
         sys.exit(1)
 
     try:
@@ -88,7 +97,7 @@ def main():
         render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls,          
                         show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
                         min_node_size=args.min_node_size, max_node_size=args.max_node_size, 
-                        font_scale_factor=DEFAULT_FONT_SCALE_FACTOR)
+                        font_scale_factor=args.font_scale_factor)
     except Exception as e:
         print(u"Error processing the call graph: {}".format(e))
 
