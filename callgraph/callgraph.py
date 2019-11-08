@@ -36,11 +36,11 @@ def main():
     parser.add_argument("-l", "--log-file", help="Log file. If it's not set, stderr is used.",
                         type=str, dest="logfile")
     parser.add_argument("--min-node-size", help="Set minimum rendered node size.", 
-                        dest="min_node_size", action="store", type=int, default=None)
+                        dest="min_node_size", action="store", type=int, default=DEFAULT_MIN_NODE_SIZE)
     parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
-                        dest="max_node_size", action="store", type=int, default=None)
+                        dest="max_node_size", action="store", type=int, default=DEFAULT_MAX_NODE_SIZE)
     parser.add_argument("--font-scale-factor", help="Set the font scale factor", 
-                        dest="font_scale_factor", action="store", type=int, default=None)
+                        dest="font_scale_factor", action="store", type=int, default=DEFAULT_FONT_SCALE_FACTOR)
 
     args = parser.parse_args()
 
@@ -75,18 +75,9 @@ def main():
             print(u"Error opening {}: {}".format(args.output, e), file=sys.stderr)
             sys.exit(1)
 
-    if args.min_node_size == None:
-        args.min_node_size = DEFAULT_MIN_NODE_SIZE
-
-    if args.max_node_size == None:
-        args.max_node_size = DEFAULT_MAX_NODE_SIZE
-
     if args.min_node_size > args.max_node_size:
         print("Minimum node size should be less than maximum node size", file=sys.stderr)
         sys.exit(1)
-
-    if args.font_scale_factor == None:
-        args.font_scale_factor = DEFAULT_FONT_SCALE_FACTOR
 
     if args.font_scale_factor < 0:
         print("Font scale factor should be greater than zero", file=sys.stderr)
