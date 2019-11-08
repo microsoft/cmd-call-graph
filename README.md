@@ -79,7 +79,7 @@ which can happen in case of programming errors, dynamic node names (e.g., `%comm
 
 If a node causes the program to exit, it is marked as `terminating`.
 
-If `--show-node-stats` is set, extra stats about each node are displayed, if present:
+Each node contains the following extra stats, if present:
 
 * number of lines of code (`LOC`);
 * number of external calls.
