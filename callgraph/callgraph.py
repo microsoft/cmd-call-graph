@@ -16,6 +16,8 @@ DEFAULT_FONT_SCALE_FACTOR = 7
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="Input cmd file.",
+                        type=str)
     parser.add_argument("--show-all-calls",
                         help="Set to show all calls in the graph.",
                         dest="allcalls", action="store_true", default=True)
@@ -29,8 +31,6 @@ def main():
                         help="List of space-separated nodes to hide.")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                         help="Output extra information about what the program does.")
-    parser.add_argument("-i", "--input", help="Input file. If it's not set, stdin is used.",
-                        type=str)
     parser.add_argument("-o", "--output", help="Output file. If it's not set, stdout is used.",
                         type=str)
     parser.add_argument("-l", "--log-file", help="Log file. If it's not set, stderr is used.",
