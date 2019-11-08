@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project uses [Semantic Versioning](https://semver.org) starting from version
 1.0.0.
 
+## [1.2.0] - 2019-11-08
+
+## Changed
+
+- The -i option is now a positional parameter, called input
+- Enabled a few options by default
+
 ## [1.1.0] - 2019-10-22
 
 ## Added
