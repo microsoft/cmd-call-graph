@@ -18,10 +18,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--show-all-calls",
                         help="Set to show all calls in the graph.",
-                        dest="allcalls", action="store_true")
+                        dest="allcalls", action="store_true", default=True)
     parser.add_argument("--show-node-stats",
                         help="Set to show statistics about the nodes in the graph.",
-                        dest="nodestats", action="store_true")
+                        dest="nodestats", action="store_true", default=True)
+    parser.add_argument("--represent-node-size",
+                        help="Nodes' size will be proportional to the number of lines they contain.",
+                        action="store_true", dest="nodesize", default=True)
     parser.add_argument("--nodes-to-hide", type=str, nargs="+", dest="nodestohide",
                         help="List of space-separated nodes to hide.")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
@@ -32,9 +35,6 @@ def main():
                         type=str)
     parser.add_argument("-l", "--log-file", help="Log file. If it's not set, stderr is used.",
                         type=str, dest="logfile")
-    parser.add_argument("--represent-node-size",
-                        help="Nodes' size will be proportional to the number of lines they contain.",
-                        action="store_true", dest="nodesize")
     parser.add_argument("--min-node-size", help="Set minimum rendered node size.", 
                         dest="min_node_size", action="store", type=int, default=None)
     parser.add_argument("--max-node-size", help="Set maximum rendered node size.", 
