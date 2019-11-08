@@ -11,7 +11,7 @@ setup(
     entry_points={
         "console_scripts": ["cmd-call-graph = callgraph.callgraph:main"]
     },
-    version="1.2.0",
+    version="1.2.1",
     author="Andrea Spadaccini",
     author_email="andrea.spadaccini@gmail.com",
     description="A simple tool to generate a call graph for calls within Windows CMD (batch) files.",
