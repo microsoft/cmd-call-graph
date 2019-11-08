@@ -18,15 +18,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="Input cmd file.",
                         type=str)
-    parser.add_argument("--show-all-calls",
-                        help="Set to show all calls in the graph.",
-                        dest="allcalls", action="store_true", default=True)
-    parser.add_argument("--show-node-stats",
-                        help="Set to show statistics about the nodes in the graph.",
-                        dest="nodestats", action="store_true", default=True)
+    parser.add_argument("--simplify-calls",
+                        help="Only show one edge for each type of call.",
+                        dest="simplifycalls", action="store_true")
+    parser.add_argument("--hide-node-stats",
+                        help="Set to hide statistics about the nodes in the graph.",
+                        dest="hidenodestats", action="store_true")
     parser.add_argument("--represent-node-size",
                         help="Nodes' size will be proportional to the number of lines they contain.",
-                        action="store_true", dest="nodesize", default=True)
+                        action="store_true", dest="nodesize")
     parser.add_argument("--nodes-to-hide", type=str, nargs="+", dest="nodestohide",
                         help="List of space-separated nodes to hide.")
     parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
@@ -85,8 +85,8 @@ def main():
 
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
-        render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=args.allcalls,          
-                        show_node_stats=args.nodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
+        render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=not args.simplifycalls,          
+                        show_node_stats=not args.hidenodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
                         min_node_size=args.min_node_size, max_node_size=args.max_node_size, 
                         font_scale_factor=args.font_scale_factor)
     except Exception as e:

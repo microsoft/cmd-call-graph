@@ -12,7 +12,10 @@ This project uses [Semantic Versioning](https://semver.org) starting from versio
 ## Changed
 
 - The -i option is now a positional parameter, called input
-- Enabled a few options by default
+- Enabled a few options by default. This implied renaming them with their corresponding
+  negation (e.g., to enable by default --show-all-calls it was renamed to --simplify-calls
+  and the corresponding logic was inverted. Same for --show-node-stats which became
+  --hide-node-stats).
 
 ## [1.1.0] - 2019-10-22
 

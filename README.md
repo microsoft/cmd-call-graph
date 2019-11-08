@@ -33,15 +33,11 @@ goto :eof
 
 This script would generate the following graph:
 
-![call graph](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-noshowall.png)
+![call graph](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-nodestats.png)
 
-If the `--show-all-calls` option is enabled, then the following graph would be generated:
+If the `--hide-node-stats` option is enabled, then the following graph would be generated:
 
 ![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
-
-If both the `--show-all-calls` and `--show-node-stats` options are enabled:
-
-![call graph showall showstats](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-nodestats.png)
 
 ## Invocation Examples
 
@@ -127,14 +123,15 @@ The above code would lead to a `nested` connection between `A` and `B`.
 
 ## Command-line options
 
-* `--show-all-calls`: create one edge for each individual `call`/`goto`, rather than just one for each type
-  of connections (which is the default). Leads to a busier but more accurate graph;
-* `--show-node-stats`: augments each node in the graph with additional information about the node (i.e., number
+The input file needs to be passed as an argument.
+
+* `--simplify-calls`: create one edge for each type of connection instead of creating one for each
+  individual `call`/`goto` (which is the default). Leads to a simpler but less accurate graph;
+* `--hide-node-stats`: removes from each node additional information about itself (i.e., number
   of lines of code, number of external calls);
 * `--nodes-to-hide`: hides the list of nodes passed as a space-separated list after this parameter.
 * `-v` or `--verbose`: enable debug output, which will be sent to the log file;
 * `-l` or `--log-file`: name of the log file. If not specified, the standard error file is used;
-* `-i` or `--input`: name of the input file. If not specified, the standard input file is used;
 * `-o` or `--output`: name of the output file. If not specified, the standard output file is used.
 
 ## Legend for Output Graphs
