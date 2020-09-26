@@ -53,7 +53,14 @@ class Node:
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
-
+    
+    # cgreen - external calls enhancements
+    # this is really just in case we need to do something different from 
+    #  a connection between graphical nodes for steps 'internal' to a script
+    def AddExternalConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
+        self.connections.add(Connection(dst, kind, line_number))
+        # do something different here? 
+   
     def AddCodeLine(self, line_number, code):
         self.code.append(CodeLine(line_number, code.strip().lower(), False))
         self.loc += 1
@@ -187,6 +194,34 @@ class CallGraph:
                     node.AddConnection(target, command, line_number)
                     print(u"Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
 
+                # cgreen - external calls enhancements
+                if command == "external_call":
+                    # cgreen -
+                    # check if the external call is to another batch file or to some other program
+                    # rudimentary check of the file extension
+                    cmdext = target.rsplit('.',1)[1] 
+                    if cmdext=="bat" or cmdext=='cmd':
+                        node.AddExternalConnection(target, command, line_number)                  
+                        print(u"!! Line {} has a external script call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
+                        # cgreen -
+                        # need a better way to determine if the call to the new cmd has a path specified
+                        #  or does it assume the cmd is in the same folder as the inital script
+                        #
+                        # if follow flag is enabled then go parse that file too..
+                        if 1==1:
+                            print(u"Follow calls would go here..")
+                            cmdfile = open(target, 'r')
+                            CallGraph.Build(cmdfile, log_file=sys.stderr)
+                        #    
+                    elif cmdext=="exe": # cgreen - maybe we need to look for more than just .exe's here..      
+                        print(u"!! Line {} has a external program call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
+                        # cgreen - arbitrarily called this 'external_program' to make the connection and
+                        #  to differentiate it from a call out to an exe instead of a bat file
+                        node.AddExternalConnection(target, "external_program", line_number)         
+                    #else:
+                        # check for something else?..
+                        #
+
                 if (command == "goto" and target == "eof") or command == "exit":
                     line.terminating = True
 
@@ -195,6 +230,7 @@ class CallGraph:
 
     @staticmethod
     def Build(input_file, log_file=sys.stderr):
+        print(u"OK.. calling Build on input file:{}".format(input_file))
         call_graph = CallGraph._ParseSource(input_file, log_file)
         for node in call_graph.nodes.values():
             call_graph._AnnotateNode(node)

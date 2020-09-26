@@ -9,10 +9,12 @@ def _Escape(input_string):
 
 
 COLORS = {
-    'goto':         '"#d83b01"',  # Orange
-    'nested':       '"#008575"',  # Teal
-    'call':         '"#0078d4"',  # Blue
-    'terminating':  '"#e6e6e6"',  # Light gray
+    'goto':          '"#d83b01"',  # Orange
+    'nested':        '"#008575"',  # Teal
+    'call':          '"#0078d4"',  # Blue
+    'terminating':   '"#e6e6e6"',  # Light gray
+    'external_call': '"#850085"',   # Purple # cgreen - external calls enhancements - to another cmd/bat file
+    'external_program': '"#358500"'   # Purple # cgreen - external calls enhancements - to an exe ..
 }
 
 def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):

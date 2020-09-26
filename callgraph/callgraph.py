@@ -13,6 +13,7 @@ from . import render
 DEFAULT_MIN_NODE_SIZE = 3
 DEFAULT_MAX_NODE_SIZE = 7
 DEFAULT_FONT_SCALE_FACTOR = 7
+DEFAULT_CALL_DEPTH_SIZE = 3 # cgreen - external calls enhancements
 
 def main():
     parser = argparse.ArgumentParser()
@@ -41,6 +42,11 @@ def main():
                         dest="max_node_size", action="store", type=int, default=DEFAULT_MAX_NODE_SIZE)
     parser.add_argument("--font-scale-factor", help="Set the font scale factor", 
                         dest="font_scale_factor", action="store", type=int, default=DEFAULT_FONT_SCALE_FACTOR)
+    # cgreen - external calls enhancements
+    parser.add_argument("-f", "--follow", action="store_true", dest="follow",
+                        help="Follow calls to external commands.")
+    parser.add_argument("--call-depth", help="Set external command call depth size. Default is 3", 
+                        dest="max_call_size", action="store", type=int, default=DEFAULT_CALL_DEPTH_SIZE)
 
     args = parser.parse_args()
 
@@ -49,6 +55,7 @@ def main():
         nodes_to_hide = set(x.lower() for x in args.nodestohide)
 
     log_file = sys.stderr
+ 
     if args.logfile:
         try:
             log_file = open(args.logfile, 'w')
@@ -82,7 +89,10 @@ def main():
     if args.font_scale_factor < 0:
         print("Font scale factor should be greater than zero", file=sys.stderr)
         sys.exit(1)
-
+    
+    if args.follow: 
+            print("Follow flag enabled")
+  
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file)
         render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=not args.simplifycalls,          

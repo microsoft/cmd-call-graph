@@ -1,0 +1,13 @@
+digraph g {
+"__begin__" [label=<<b>__begin__</b><br/>(line 1)<br/><sub>[2 LOC]</sub>>]
+"__begin__" -> "a" [label=" nested",color="#008575"]
+"a" [label=<<b>a</b><br/>(line 3)<br/><sub>[3 LOC]</sub>>]
+"a" -> "b" [label=" nested",color="#008575"]
+"b" [label=<<b>b</b><br/>(line 6)<br/><sub>[7 LOC]</sub><br/><sub>[2 external calls]</sub>>]
+"b" -> "c" [label=" nested",color="#008575"]
+"b" -> "c:\dev\cmd-call-graph\examples\foo.cmd" [label=<<b>external_call</b><br />(line 9)>,color="#850085"]
+"b" -> "powershell.exe" [label=<<b>external_program</b><br />(line 12)>,color="#358500"]
+"c" [color="#e6e6e6",style=filled,label=<<b>c</b><br/>(line 13)<br/><sub>[5 LOC]</sub><br/><sub>[2 external calls]</sub><br/><sub>[terminating]</sub>>]
+"c" -> "powershell.exe" [label=<<b>external_program</b><br />(line 16)>,color="#358500"]
+"c" -> "powershell.exe" [label=<<b>external_program</b><br />(line 17)>,color="#358500"]
+}

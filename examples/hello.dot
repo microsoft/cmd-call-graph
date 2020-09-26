@@ -1,0 +1,9 @@
+digraph g {
+"__begin__" [label=<<b>__begin__</b><br/>(line 1)<br/><sub>[5 LOC]</sub>>]
+"__begin__" -> "hello" [label=<<b>goto</b><br />(line 4)>,color="#d83b01"]
+"goodbye" [color="#e6e6e6",style=filled,label=<<b>goodbye</b><br/>(line 15)<br/><sub>[4 LOC]</sub><br/><sub>[terminating]</sub>>]
+"hello" [label=<<b>hello</b><br/>(line 10)<br/><sub>[5 LOC]</sub>>]
+"hello" -> "hi" [label=<<b>goto</b><br />(line 12)>,color="#d83b01"]
+"hi" [label=<<b>hi</b><br/>(line 6)<br/><sub>[4 LOC]</sub>>]
+"hi" -> "goodbye" [label=<<b>goto</b><br />(line 8)>,color="#d83b01"]
+}
