@@ -33,11 +33,11 @@ goto :eof
 
 This script would generate the following graph:
 
-![call graph](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1-nodestats.png)
+![call graph](examples/example1-nodestats.png)
 
 If the `--hide-node-stats` option is enabled, then the following graph would be generated:
 
-![call graph showall](https://github.com/Microsoft/cmd-call-graph/raw/master/examples/example1.png)
+![call graph showall](examples/example1.png)
 
 ## Invocation Examples
 
