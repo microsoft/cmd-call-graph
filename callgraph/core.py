@@ -87,6 +87,7 @@ class CallGraph:
         self.nodes = {}
         self.log_file = log_file
         self.first_node = None
+        self.cmddict = {} #cgreen - collection of external call graph instances
 
     def GetOrCreateNode(self, name):
         if name in self.nodes:
@@ -95,6 +96,15 @@ class CallGraph:
         node = Node(name)
         self.nodes[name] = node
         return node
+
+    def GetOrCreateCmdDict(self, name):
+        if name in self.cmddict:
+            return self.cmddict[name]
+
+        #node = Node(name)
+        self.cmddict[name] = name
+        return self.cmddict
+
 
     def _MarkExitNodes(self):
         # A node is an exit node if:
@@ -210,8 +220,10 @@ class CallGraph:
                         # if follow flag is enabled then go parse that file too..
                         if 1==1:
                             print(u"Follow calls would go here..")
-                            cmdfile = open(target, 'r')
-                            CallGraph.Build(cmdfile, log_file=sys.stderr)
+                            cmdfile = open(target, 'r')                            
+                            #call_graph = CallGraph.Build(cmdfile, log_file=sys.stderr)
+                            if target not in self.cmddict.keys():
+                                self.cmddict[target] = CallGraph.Build(cmdfile, log_file=sys.stderr)
                         #    
                     elif cmdext=="exe": # cgreen - maybe we need to look for more than just .exe's here..      
                         print(u"!! Line {} has a external program call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)

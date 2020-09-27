@@ -18,6 +18,24 @@ COLORS = {
 }
 
 def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
+    # Output the DOT header.
+    print(u"digraph g {", file=out_file)
+    
+    # Output the DOT body
+    PrintDotContents(call_graph, out_file, log_file, True, False, None, False, 3, 7, 7)
+
+#    for key, value in call_graph.cmddict.items():
+#        if type(value.cmddict) is dict:
+#            PrintDotContents(value, out_file, log_file, True, False, None, False, 3, 7, 7)
+
+    for key in call_graph.cmddict:
+        graphdict = call_graph.cmddict.get(key)
+        PrintDotContents(graphdict, out_file, log_file, True, False, None, False, 3, 7, 7)
+    
+    # Output the DOT footer
+    print(u"}", file=out_file)
+
+def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
     if min_node_size > max_node_size:
         min_node_size, max_node_size = max_node_size, min_node_size
 
@@ -26,9 +44,6 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
     if min_node_size < 1:
         min_node_size = 1
-    
-    # Output the DOT code.
-    print(u"digraph g {", file=out_file)
 
     max_node_loc = 0
 
@@ -104,4 +119,3 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
             dst_escaped_name = _Escape(c.dst)
             print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, COLORS[c.kind]), file=out_file)
 
-    print(u"}", file=out_file)

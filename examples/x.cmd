@@ -5,8 +5,7 @@
 
 :b
     rem second line
-    rem third line
-    call c:\dev\cmd-call-graph\examples\foo.cmd
+    rem third line 
     rem second line
     rem third line
     call powershell.exe foo.ps1
