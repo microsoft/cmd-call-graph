@@ -1,6 +1,5 @@
 # cmd-call-graph
 
-[![Build Status](https://dev.azure.com/cmd-call-graph/cmd-call-graph/_apis/build/status/Microsoft.cmd-call-graph?branchName=master)](https://dev.azure.com/cmd-call-graph/cmd-call-graph/_build/latest?definitionId=1?branchName=master)
 [![PyPI](https://img.shields.io/pypi/v/cmd-call-graph.svg)](https://pypi.org/project/cmd-call-graph/)
 
 A simple tool to generate a call graph for calls within Windows CMD (batch) files.
