@@ -317,7 +317,12 @@ class CallGraph:
     def _ParseSource(input_file, log_file=sys.stderr):
         call_graph = CallGraph(log_file)
         # Special node to signal the start of the script.
-        cur_node = call_graph.GetOrCreateNode("__begin__")
+        cur_node = call_graph.GetOrCreateNode("__begin__"  + input_file.name)
+        # cgreen - not sure if we want to keep this as modified here
+        #   concatenating the external script name with the 'begin' node to reference  
+        #   content nodes of external script with where it is called from
+        src_node = call_graph.GetOrCreateNode(input_file.name)
+        src_node.AddConnection("__begin__"  + input_file.name, "external_call")    
         cur_node.line_number = 1
         call_graph.first_node = cur_node
 
@@ -348,7 +353,7 @@ class CallGraph:
                     # so we avoid having two
                     # nodes with the same line number.
                     if line_number == 1:
-                        del call_graph.nodes["__begin__"]
+                        del call_graph.nodes["__begin__" + input_file.name] # cgreen - since now has source file name
                         call_graph.first_node = next_node
 
                     cur_node = next_node
