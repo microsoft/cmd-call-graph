@@ -219,9 +219,7 @@ class CallGraph:
                         #
                         # if follow flag is enabled then go parse that file too..
                         if 1==1:
-                            print(u"Follow calls would go here..")
                             cmdfile = open(target, 'r')                            
-                            #call_graph = CallGraph.Build(cmdfile, log_file=sys.stderr)
                             if target not in self.cmddict.keys():
                                 self.cmddict[target] = CallGraph.Build(cmdfile, log_file=sys.stderr)
                         #    
@@ -242,7 +240,8 @@ class CallGraph:
 
     @staticmethod
     def Build(input_file, log_file=sys.stderr):
-        print(u"OK.. calling Build on input file:{}".format(input_file))
+        print(u"*** Calling Build on input file:{}".format(input_file), file=log_file)
+
         call_graph = CallGraph._ParseSource(input_file, log_file)
         for node in call_graph.nodes.values():
             call_graph._AnnotateNode(node)
@@ -252,14 +251,16 @@ class CallGraph:
         eof = call_graph.GetOrCreateNode("eof")
         all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
         destinations = set((c.dst, c.kind) for c in all_connections)
+
         if eof.line_number == NO_LINE_NUMBER and ("eof", "call") not in destinations and ("eof", "nested") not in destinations:
             print(u"Removing the eof node, since there are no call/nested connections to it and it's not a real node", file=log_file)
             del call_graph.nodes["eof"]
             for node in call_graph.nodes.values():
-                eof_connections = [c for c in node.connections if c.dst == "eof"]
-                print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
-                for c in eof_connections:
-                    node.connections.remove(c)
+                if "c.cmd" not in node.name or 'cwork' not in node.name:
+                    eof_connections = [c for c in node.connections if c.dst == "eof"]
+                    print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
+                    for c in eof_connections:
+                        node.connections.remove(c)
 
         # Warn the user if there are goto connections to eof
         # which will not be executed by CMD.
@@ -315,14 +316,15 @@ class CallGraph:
     # starting point for the processing.
     @staticmethod
     def _ParseSource(input_file, log_file=sys.stderr):
+        print(u"*** Calling _ParseSource:{}".format(input_file), file=sys.stderr)
         call_graph = CallGraph(log_file)
         # Special node to signal the start of the script.
-        cur_node = call_graph.GetOrCreateNode("__begin__"  + input_file.name)
+        cur_node = call_graph.GetOrCreateNode("__begin__"  + input_file.name.lower())
         # cgreen - not sure if we want to keep this as modified here
         #   concatenating the external script name with the 'begin' node to reference  
         #   content nodes of external script with where it is called from
         src_node = call_graph.GetOrCreateNode(input_file.name)
-        src_node.AddConnection("__begin__"  + input_file.name, "external_call")    
+        src_node.AddConnection("__begin__"  + input_file.name.lower(), "external_call")    
         cur_node.line_number = 1
         call_graph.first_node = cur_node
 
@@ -353,7 +355,7 @@ class CallGraph:
                     # so we avoid having two
                     # nodes with the same line number.
                     if line_number == 1:
-                        del call_graph.nodes["__begin__" + input_file.name] # cgreen - since now has source file name
+                        del call_graph.nodes["__begin__" + input_file.name.lower()] # cgreen - since now has source file name
                         call_graph.first_node = next_node
 
                     cur_node = next_node

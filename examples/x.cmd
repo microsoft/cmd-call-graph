@@ -1,15 +1,15 @@
 @echo off
 
-:a
+:x
     rem second line
 
-:b
+:y
     rem second line
     rem third line 
     rem second line
     rem third line
     call powershell.exe foo.ps1
-:c
+:z
     rem second line
     rem third line
     call powershell.exe foo.ps1
