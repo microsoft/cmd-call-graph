@@ -54,4 +54,5 @@ jobs:
       run: |
         sudo apt-get install graphviz
     - name: Generate sample images
+      run: |
         bash scripts/generate-examples.sh
