@@ -56,3 +56,15 @@ jobs:
     - name: Generate sample images
       run: |
         bash scripts/generate-examples.sh
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Build sdist
+      run: |
+        python setup.py sdist
