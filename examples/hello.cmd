@@ -9,7 +9,7 @@ goto :hello
 
 :hello
     echo "hello"
-    call c:\dev\cmd-call-graph\examples\a.cmd  
+    call c:\dev\cmd-call-graph\examples\loc.cmd  
     goto :hi
 
 

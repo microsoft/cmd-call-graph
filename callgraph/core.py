@@ -256,11 +256,10 @@ class CallGraph:
             print(u"Removing the eof node, since there are no call/nested connections to it and it's not a real node", file=log_file)
             del call_graph.nodes["eof"]
             for node in call_graph.nodes.values():
-                if "c.cmd" not in node.name or 'cwork' not in node.name:
-                    eof_connections = [c for c in node.connections if c.dst == "eof"]
-                    print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
-                    for c in eof_connections:
-                        node.connections.remove(c)
+                eof_connections = [c for c in node.connections if c.dst == "eof"]
+                print(u"Removing {} eof connections in node {}".format(len(eof_connections), node.name), file=log_file)
+                for c in eof_connections:
+                    node.connections.remove(c)
 
         # Warn the user if there are goto connections to eof
         # which will not be executed by CMD.

@@ -11,7 +11,6 @@ goto :eof
 
 :foo
     echo "In foo" 
-    call c:\dev\cmd-call-graph\examples\a.cmd 
     call c:\dev\cmd-call-graph\examples\x.cmd 
     call c:\dev\cmd-call-graph\examples\hello.cmd  
     goto :bar
