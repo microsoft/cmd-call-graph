@@ -27,31 +27,15 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
     # Recursively look for nested command dictionaries belonging to build out the entire graph
     RecurseCmdDict(call_graph, out_file, log_file)
 
-# cgreen - this can all get cleaned up once confirmed recursive call is working
-#
-#   PrintDotFoo("xyz", out_file, log_file, True, False, None, False, 3, 7, 7)
-#    for key in call_graph.cmddict:
-#        print(u"+++++++++++++\n{}".format(key))
-#        graphdict = call_graph.cmddict.get(key)
-#        PrintDotContents(graphdict, out_file, log_file, True, False, None, False, 3, 7, 7)
-#
-#        for key2 in graphdict.cmddict:
-#            gd2 = graphdict.cmddict.get(key2)
-#            PrintDotContents(gd2, out_file, log_file, True, False, None, False, 3, 7, 7)
-#            for key3 in gd2.cmddict:
-#                gd3 = gd2.cmddict.get(key3)
-#                PrintDotContents(gd3, out_file, log_file, True, False, None, False, 3, 7, 7)
-
     # Output the DOT footer
     print(u"}", file=out_file)
 
 def RecurseCmdDict(cg, out_file=sys.stdout, log_file=sys.stderr): 
     for k in cg.cmddict:
-        print(u">>key:{}".format(k))  
         gd = cg.cmddict.get(k)
         if isinstance(gd.cmddict, dict):
             PrintDotContents(gd, out_file, log_file, True, False, None, False, 3, 7, 7)
-            iterdict2(gd, out_file, log_file)
+            RecurseCmdDict(gd, out_file, log_file)
 
 def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
     if min_node_size > max_node_size:
@@ -92,7 +76,9 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
         attributes = []
         label_lines = ["<b>{}</b>".format(pretty_name)]
 
-        if node.line_number > 0:
+        if node.line_number < 0:
+            attributes.append("style=filled,fillcolor=lightgoldenrodyellow,shape=folder,margin=.3") 
+        elif node.line_number > 0:
             label_lines.append("(line {})".format(node.line_number))
 
         if show_node_stats:
@@ -140,5 +126,7 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
                 label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
             src_escaped_name = _Escape(name)
             dst_escaped_name = _Escape(c.dst)
+            if c.kind == "external_program":
+                print(u"\"{}\" [style=filled,shape=folder]".format(dst_escaped_name), file=out_file)
             print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, COLORS[c.kind]), file=out_file)
 

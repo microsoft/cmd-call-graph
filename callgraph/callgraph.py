@@ -43,7 +43,7 @@ def main():
     parser.add_argument("--font-scale-factor", help="Set the font scale factor", 
                         dest="font_scale_factor", action="store", type=int, default=DEFAULT_FONT_SCALE_FACTOR)
     # cgreen - external calls enhancements
-    parser.add_argument("-f", "--follow", action="store_true", dest="follow",
+    parser.add_argument("-f", "--follow", action="store_true", dest="follow_calls",
                         help="Follow calls to external commands.")
     parser.add_argument("--call-depth", help="Set external command call depth size. Default is 3", 
                         dest="max_call_size", action="store", type=int, default=DEFAULT_CALL_DEPTH_SIZE)
@@ -90,11 +90,11 @@ def main():
         print("Font scale factor should be greater than zero", file=sys.stderr)
         sys.exit(1)
     
-    if args.follow: 
+    if args.follow_calls: 
             print("Follow flag enabled")
   
     try:
-        call_graph = core.CallGraph.Build(input_file, log_file=log_file)
+        call_graph = core.CallGraph.Build(input_file, log_file=log_file, follow_calls=args.follow_calls)
         render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=not args.simplifycalls,          
                         show_node_stats=not args.hidenodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
                         min_node_size=args.min_node_size, max_node_size=args.max_node_size, 

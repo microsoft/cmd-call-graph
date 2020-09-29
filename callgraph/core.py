@@ -149,7 +149,7 @@ class CallGraph:
     # contents of the code, such as connections
     # deriving from goto/call commands and
     # whether the node is terminating or not.
-    def _AnnotateNode(self, node):
+    def _AnnotateNode(self, node, follow_calls=False):
         print(u"Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
         for i in range(len(node.code)):
             line = node.code[i]
@@ -217,12 +217,10 @@ class CallGraph:
                         # need a better way to determine if the call to the new cmd has a path specified
                         #  or does it assume the cmd is in the same folder as the inital script
                         #
-                        # if follow flag is enabled then go parse that file too..
-                        if 1==1:
+                        if follow_calls:
                             cmdfile = open(target, 'r')                            
                             if target not in self.cmddict.keys():
-                                self.cmddict[target] = CallGraph.Build(cmdfile, log_file=sys.stderr)
-                        #    
+                                self.cmddict[target] = CallGraph.Build(cmdfile, sys.stderr, follow_calls)    
                     elif cmdext=="exe": # cgreen - maybe we need to look for more than just .exe's here..      
                         print(u"!! Line {} has a external program call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
                         # cgreen - arbitrarily called this 'external_program' to make the connection and
@@ -239,12 +237,12 @@ class CallGraph:
                     line.terminating = True
 
     @staticmethod
-    def Build(input_file, log_file=sys.stderr):
+    def Build(input_file, log_file=sys.stderr, follow_calls=False):
         print(u"*** Calling Build on input file:{}".format(input_file), file=log_file)
 
         call_graph = CallGraph._ParseSource(input_file, log_file)
         for node in call_graph.nodes.values():
-            call_graph._AnnotateNode(node)
+            call_graph._AnnotateNode(node, follow_calls)
 
         # Prune away EOF if it is a virtual node (no line number) and
         # there are no call/nested connections to it.
