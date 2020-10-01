@@ -14,7 +14,9 @@ COLORS = {
     'call':             '"#0078d4"',  # Blue
     'terminating':      '"#e6e6e6"',  # Light gray
     'external_call':    '"#850085"',  # Purple # cgreen - external calls enhancements - to another cmd/bat file
-    'external_program': '"#358500"'   # Purple # cgreen - external calls enhancements - to an exe ..
+    'external_program': '"#358500"',  # Green # cgreen - external calls enhancements - to an exe ..
+    'folder_start':     '"#ffec8b"',  # Light gold
+    'folder_end':       '"#b8860b"'   # Dark gold
 }
 
 def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
@@ -77,7 +79,7 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
         label_lines = ["<b>{}</b>".format(pretty_name)]
 
         if node.line_number < 0:
-            attributes.append("style=filled,fillcolor=lightgoldenrodyellow,shape=folder,margin=.3") 
+            attributes.append("style=filled,fillcolor={},shape=folder,margin=.3".format(COLORS["folder_start"])) 
         elif node.line_number > 0:
             label_lines.append("(line {})".format(node.line_number))
 
@@ -127,6 +129,14 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
             src_escaped_name = _Escape(name)
             dst_escaped_name = _Escape(c.dst)
             if c.kind == "external_program":
+                # represent external program a grey folder shape
                 print(u"\"{}\" [style=filled,shape=folder]".format(dst_escaped_name), file=out_file)
+            elif (c.kind == "external_call") and (c.line_number > 0): 
+                # any other external cmd files at this point haven't been parsed (due to max call depth)
+                #  so just render as a dark folder shape
+                #  & there was a bug here where rendering the name without the label attribute was
+                #   causing the name in the shape to appear to need to be escaped
+                print(u"\"{0}\" [style=filled,shape=folder,margin=.3,fillcolor={1},label=<<b>{0}</b><br/>End Parsing>]".format(dst_escaped_name, COLORS["folder_end"]), file=out_file)
+
             print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, COLORS[c.kind]), file=out_file)
 

@@ -3,7 +3,6 @@ echo "loc.."
 goto :one
 :one
     dir
-     
 :two
     rem second line
 :three

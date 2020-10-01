@@ -87,7 +87,7 @@ class CallGraph:
         self.nodes = {}
         self.log_file = log_file
         self.first_node = None
-        self.cmddict = {} #cgreen - collection of external call graph instances
+        self.cmddict = {}       #cgreen - collection of external call graph instances
 
     def GetOrCreateNode(self, name):
         if name in self.nodes:
@@ -149,7 +149,7 @@ class CallGraph:
     # contents of the code, such as connections
     # deriving from goto/call commands and
     # whether the node is terminating or not.
-    def _AnnotateNode(self, node, follow_calls=False):
+    def _AnnotateNode(self, node, follow_calls=False, call_depth=None, expand_files=None, exclude_files=None):
         print(u"Annotating node {0} (line {1})".format(node.original_name, node.line_number), file=self.log_file)
         for i in range(len(node.code)):
             line = node.code[i]
@@ -206,29 +206,22 @@ class CallGraph:
 
                 # cgreen - external calls enhancements
                 if command == "external_call":
-                    # cgreen -
-                    # check if the external call is to another batch file or to some other program
-                    # rudimentary check of the file extension
-                    cmdext = target.rsplit('.',1)[1] 
+                    cmdext = target.rsplit('.',1)[1]    # rudimentary check of the file extension
                     if cmdext=="bat" or cmdext=='cmd':
                         node.AddExternalConnection(target, command, line_number)                  
                         print(u"!! Line {} has a external script call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
-                        # cgreen -
-                        # need a better way to determine if the call to the new cmd has a path specified
-                        #  or does it assume the cmd is in the same folder as the inital script
                         #
-                        if follow_calls:
-                            cmdfile = open(target, 'r')                            
-                            if target not in self.cmddict.keys():
-                                self.cmddict[target] = CallGraph.Build(cmdfile, sys.stderr, follow_calls)    
-                    elif cmdext=="exe": # cgreen - maybe we need to look for more than just .exe's here..      
+                        # this is where we are parsing any called cmd files.. as appropriate
+                        #
+                        if (follow_calls) and (call_depth>0):
+                            if ( ((len(expand_files)==0) or (target in expand_files)) and
+                                ((len(exclude_files)==0) or (target not in exclude_files)) ):
+                                cmdfile = open(target, 'r')                            
+                                if target not in self.cmddict.keys():
+                                    self.cmddict[target] = CallGraph.Build(cmdfile, sys.stderr, follow_calls, call_depth, expand_files, exclude_files) 
+                    elif cmdext=="exe": 
                         print(u"!! Line {} has a external program call towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
-                        # cgreen - arbitrarily called this 'external_program' to make the connection and
-                        #  to differentiate it from a call out to an exe instead of a bat file
                         node.AddExternalConnection(target, "external_program", line_number)         
-                    #else:
-                        # check for something else?..
-                        #
 
                 if (command == "goto" and target == "eof") or command == "exit":
                     line.terminating = True
@@ -237,12 +230,20 @@ class CallGraph:
                     line.terminating = True
 
     @staticmethod
-    def Build(input_file, log_file=sys.stderr, follow_calls=False):
+    def Build(input_file, log_file=sys.stderr, follow_calls=False, call_depth=None, expand_files=None, exclude_files=None):
         print(u"*** Calling Build on input file:{}".format(input_file), file=log_file)
+        print(u"*** call depth..{}".format(call_depth))
 
-        call_graph = CallGraph._ParseSource(input_file, log_file)
+        call_graph = CallGraph._ParseSource(input_file, log_file, call_depth, expand_files, exclude_files)
+        if call_depth == -1:
+            print('No need to decrement depth counter')
+        else:
+            # decrement the call_depth counter for each resulting
+            #  call to Build down the tree
+            call_depth -= 1 
+
         for node in call_graph.nodes.values():
-            call_graph._AnnotateNode(node, follow_calls)
+            call_graph._AnnotateNode(node, follow_calls, call_depth, expand_files, exclude_files)
 
         # Prune away EOF if it is a virtual node (no line number) and
         # there are no call/nested connections to it.
@@ -312,7 +313,7 @@ class CallGraph:
     # information that depend on the contents of the node, as this is just the
     # starting point for the processing.
     @staticmethod
-    def _ParseSource(input_file, log_file=sys.stderr):
+    def _ParseSource(input_file, log_file=sys.stderr, call_depth=None, expand_files=None, exclude_files=None):
         print(u"*** Calling _ParseSource:{}".format(input_file), file=sys.stderr)
         call_graph = CallGraph(log_file)
         # Special node to signal the start of the script.

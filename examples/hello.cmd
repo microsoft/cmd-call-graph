@@ -5,6 +5,7 @@ goto :hello
 
 :hi
     echo "hi"
+    goto :baz
     goto :goodbye
 
 :hello
@@ -12,6 +13,8 @@ goto :hello
     call c:\dev\cmd-call-graph\examples\loc.cmd  
     goto :hi
 
+:baz
+    echo "in baz"
 
 :goodbye
     echo "goodbye"

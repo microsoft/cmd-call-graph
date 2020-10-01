@@ -3,6 +3,7 @@
 :x
     rem second line
 
+    call c:\dev\cmd-call-graph\examples\a.cmd  
 :y
     rem second line
     rem third line 

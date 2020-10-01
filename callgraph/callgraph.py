@@ -13,7 +13,7 @@ from . import render
 DEFAULT_MIN_NODE_SIZE = 3
 DEFAULT_MAX_NODE_SIZE = 7
 DEFAULT_FONT_SCALE_FACTOR = 7
-DEFAULT_CALL_DEPTH_SIZE = 3 # cgreen - external calls enhancements
+DEFAULT_MAX_CALL_DEPTH = -1 # cgreen - external calls enhancements
 
 def main():
     parser = argparse.ArgumentParser()
@@ -45,8 +45,12 @@ def main():
     # cgreen - external calls enhancements
     parser.add_argument("-f", "--follow", action="store_true", dest="follow_calls",
                         help="Follow calls to external commands.")
-    parser.add_argument("--call-depth", help="Set external command call depth size. Default is 3", 
-                        dest="max_call_size", action="store", type=int, default=DEFAULT_CALL_DEPTH_SIZE)
+    parser.add_argument("--max-call-depth", help="Set external command call depth. Default is 3", 
+                        dest="max_call_depth", action="store", type=int, default=DEFAULT_MAX_CALL_DEPTH)
+    parser.add_argument("-e", "--expand-file-list", type=str, nargs="+", dest="filestoexpand",
+                        help="List of cmd file names to expand.")
+    parser.add_argument("-x", "--exclude-file-list", type=str, nargs="+", dest="filestoexclude",
+                        help="List of cmd file names to exclude from parsing.")
 
     args = parser.parse_args()
 
@@ -92,9 +96,22 @@ def main():
     
     if args.follow_calls: 
             print("Follow flag enabled")
+
+    if args.max_call_depth:
+        print(u"max call depth:{}".format(args.max_call_depth))
+
+    if not args.filestoexpand:
+        expand_files = [] 
+    else:
+        expand_files = [x.strip(' ') for x in args.filestoexpand[0].split(',')]
   
+    if not args.filestoexclude:
+        filestoexclude = [] 
+    else:
+        #filestoexclude = args.filestoexclude[0].split(',')
+        filestoexclude = [x.strip(' ') for x in args.filestoexclude[0].split(',')]
     try:
-        call_graph = core.CallGraph.Build(input_file, log_file=log_file, follow_calls=args.follow_calls)
+        call_graph = core.CallGraph.Build(input_file, log_file=log_file, follow_calls=args.follow_calls, call_depth=args.max_call_depth, expand_files=expand_files, exclude_files=filestoexclude)
         render.PrintDot(call_graph, out_file=output_file, log_file=log_file, show_all_calls=not args.simplifycalls,          
                         show_node_stats=not args.hidenodestats, nodes_to_hide=nodes_to_hide, represent_node_size=args.nodesize, 
                         min_node_size=args.min_node_size, max_node_size=args.max_node_size, 
