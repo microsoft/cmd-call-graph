@@ -50,6 +50,8 @@ class Node:
         self.loc = 0
         self.node_width = 0
         self.node_height = 0
+        self.src_file_name = ''
+        self.ID = None
 
     def AddConnection(self, dst, kind, line_number=NO_LINE_NUMBER):
         self.connections.add(Connection(dst, kind, line_number))
@@ -89,11 +91,13 @@ class CallGraph:
         self.first_node = None
         self.cmddict = {}       #cgreen - collection of external call graph instances
 
-    def GetOrCreateNode(self, name):
+    def GetOrCreateNode(self, name, src_file_name):
         if name in self.nodes:
             return self.nodes[name]
 
         node = Node(name)
+        node.src_file_name = src_file_name # cgreen - new
+        node.ID = name + '~' + src_file_name # cgreen - create a compound key for the node
         self.nodes[name] = node
         return node
 
@@ -213,7 +217,7 @@ class CallGraph:
                         #
                         # this is where we are parsing any called cmd files.. as appropriate
                         #
-                        if (follow_calls) and (call_depth>0):
+                        if (follow_calls) and (call_depth != 0):
                             if ( ((len(expand_files)==0) or (target in expand_files)) and
                                 ((len(exclude_files)==0) or (target not in exclude_files)) ):
                                 cmdfile = open(target, 'r')                            
@@ -247,7 +251,7 @@ class CallGraph:
 
         # Prune away EOF if it is a virtual node (no line number) and
         # there are no call/nested connections to it.
-        eof = call_graph.GetOrCreateNode("eof")
+        eof = call_graph.GetOrCreateNode("eof", input_file.name)
         all_connections = itertools.chain.from_iterable(n.connections for n in call_graph.nodes.values())
         destinations = set((c.dst, c.kind) for c in all_connections)
 
@@ -278,7 +282,9 @@ class CallGraph:
             if not prev_node.code or all_noop:
                 print(u"Adding nested connection between {0} and {1} because all_noop ({2}) or empty code ({3})".format(
                     prev_node.name, cur_node.name, all_noop, not prev_node.code), file=log_file)
-                prev_node.AddConnection(cur_node.name, "nested")
+#                #prev_node.AddConnection(cur_node.name, "nested")
+                prev_node.AddConnection(cur_node.ID, "nested")
+                
                 break
 
             # Heuristic for "nested" connections:
@@ -296,7 +302,8 @@ class CallGraph:
                 if "exit" not in commands and "goto" not in commands:
                     print(u"Adding nested connection between {0} and {1} because there is a non-exit or non-goto command.".format(
                         prev_node.name, cur_node.name), file=log_file)
-                    prev_node.AddConnection(cur_node.name, "nested")
+#                    #prev_node.AddConnection(cur_node.name, "nested")
+                    prev_node.AddConnection(cur_node.ID, "nested")
 
                 break
 
@@ -317,17 +324,16 @@ class CallGraph:
         print(u"*** Calling _ParseSource:{}".format(input_file), file=sys.stderr)
         call_graph = CallGraph(log_file)
         # Special node to signal the start of the script.
-        cur_node = call_graph.GetOrCreateNode("__begin__"  + input_file.name.lower())
-        # cgreen - not sure if we want to keep this as modified here
-        #   concatenating the external script name with the 'begin' node to reference  
-        #   content nodes of external script with where it is called from
-        src_node = call_graph.GetOrCreateNode(input_file.name)
-        src_node.AddConnection("__begin__"  + input_file.name.lower(), "external_call")    
+        cur_node = call_graph.GetOrCreateNode("__begin__" + input_file.name, input_file.name) 
+        src_node = call_graph.GetOrCreateNode(input_file.name, input_file.name)
+#        #src_node.AddConnection("__begin__" + input_file.name.lower(), "external_call") 
+        src_node.AddConnection(cur_node.ID, "external_call") 
+        
         cur_node.line_number = 1
         call_graph.first_node = cur_node
 
         # Special node used by cmd to signal the end of the script.
-        eof = call_graph.GetOrCreateNode("eof")
+        eof = call_graph.GetOrCreateNode("eof", input_file.name)
         eof.is_exit_node = True
 
         for line_number, line in enumerate(input_file, 1):
@@ -345,7 +351,7 @@ class CallGraph:
 
                 print(u"Line {} defines a new block: <{}>".format(line_number, block_name), file=log_file)
                 if block_name:
-                    next_node = call_graph.GetOrCreateNode(block_name)
+                    next_node = call_graph.GetOrCreateNode(block_name, input_file.name)
                     next_node.line_number = line_number
                     next_node.original_name = original_block_name
 
@@ -353,7 +359,7 @@ class CallGraph:
                     # so we avoid having two
                     # nodes with the same line number.
                     if line_number == 1:
-                        del call_graph.nodes["__begin__" + input_file.name.lower()] # cgreen - since now has source file name
+                        del call_graph.nodes["__begin__" + input_file.name] 
                         call_graph.first_node = next_node
 
                     cur_node = next_node

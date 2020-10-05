@@ -108,7 +108,6 @@ def main():
     if not args.filestoexclude:
         filestoexclude = [] 
     else:
-        #filestoexclude = args.filestoexclude[0].split(',')
         filestoexclude = [x.strip(' ') for x in args.filestoexclude[0].split(',')]
     try:
         call_graph = core.CallGraph.Build(input_file, log_file=log_file, follow_calls=args.follow_calls, call_depth=args.max_call_depth, expand_files=expand_files, exclude_files=filestoexclude)
