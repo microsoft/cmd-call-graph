@@ -110,7 +110,7 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
             attributes.append("fontsize={}".format(nw * font_scale_factor))
 
         if attributes:
-            print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
+            print(u"\"{}\" [{}]".format(node.ID, ",".join(attributes)), file=out_file) # cgreen - change name to node.id
 
         # De-duplicate connections by line number if show_all_calls is set to
         # False.
@@ -128,6 +128,8 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
                 label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
             src_escaped_name = _Escape(name)
             dst_escaped_name = _Escape(c.dst)
+            if "~" in dst_escaped_name:
+                dst_escaped_name = dst_escaped_name.split('~')[1]
             if c.kind == "external_program":
                 # represent external program a grey folder shape
                 print(u"\"{}\" [style=filled,shape=folder]".format(dst_escaped_name), file=out_file)
@@ -136,7 +138,7 @@ def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_
                 #  so just render as a dark folder shape
                 #  & there was a bug here where rendering the name without the label attribute was
                 #   causing the name in the shape to appear to need to be escaped
-                print(u"\"{0}\" [style=filled,shape=folder,margin=.3,fillcolor={1},label=<<b>{0}</b><br/>End Parsing>]".format(dst_escaped_name, COLORS["folder_end"]), file=out_file)
+                print(u"\"{0}\" [style=filled,shape=folder,margin=.3,fillcolor={2},label=<<b>{1}</b><br/>End Parsing>]".format(node.ID, dst_escaped_name, COLORS["folder_end"]), file=out_file)
 
-            print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, COLORS[c.kind]), file=out_file)
-
+            print(u"\"{}\" -> \"{}\" [label={},color={}]".format(node.ID, c.dst, label, COLORS[c.kind]), file=out_file)
+            # cgreen - change src_escaped_name to node.id, dst_escpated_name to c.dst

@@ -97,7 +97,7 @@ class CallGraph:
 
         node = Node(name)
         node.src_file_name = src_file_name # cgreen - new
-        node.ID = name + '~' + src_file_name # cgreen - create a compound key for the node
+        node.ID = 'ID~' + name + '~' + src_file_name # cgreen - create a compound key for the node
         self.nodes[name] = node
         return node
 
@@ -204,7 +204,7 @@ class CallGraph:
                     line.AddCommand(Command("exit", target))
 
             for command, target in line.commands:
-                if command == "call" or command == "goto":
+                if command == "call" or command == "goto": 
                     node.AddConnection(target, command, line_number)
                     print(u"Line {} has a goto towards: <{}>. Current block: {}".format(line_number, target, node.name), file=self.log_file)
 
