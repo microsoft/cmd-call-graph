@@ -1,18 +1,16 @@
 @echo off
-echo "loc.."
-goto :one
-:one
-    dir
-:two
+
+:x
     rem second line
-:three
+
+    call c:\dev\cmd-call-graph\examples\a.cmd  
+:y
     rem second line
-    rem third line
-:four
+    rem third line 
     rem second line
     rem third line
     call powershell.exe foo.ps1
-:five
+:z
     rem second line
     rem third line
     call powershell.exe foo.ps1

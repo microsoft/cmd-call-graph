@@ -9,13 +9,37 @@ def _Escape(input_string):
 
 
 COLORS = {
-    'goto':         '"#d83b01"',  # Orange
-    'nested':       '"#008575"',  # Teal
-    'call':         '"#0078d4"',  # Blue
-    'terminating':  '"#e6e6e6"',  # Light gray
+    'goto':             '"#d83b01"',  # Orange
+    'nested':           '"#008575"',  # Teal
+    'call':             '"#0078d4"',  # Blue
+    'terminating':      '"#e6e6e6"',  # Light gray
+    'external_call':    '"#850085"',  # Purple # cgreen - external calls enhancements - to another cmd/bat file
+    'external_program': '"#358500"',  # Green # cgreen - external calls enhancements - to an exe ..
+    'folder_start':     '"#ffec8b"',  # Light gold
+    'folder_end':       '"#b8860b"'   # Dark gold
 }
 
 def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
+    # Output the DOT header.
+    print(u"digraph g {", file=out_file)
+    
+    # Output the DOT body for the initial graph nodes
+    PrintDotContents(call_graph, out_file, log_file, True, False, None, False, 3, 7, 7)
+  
+    # Recursively look for nested command dictionaries belonging to build out the entire graph
+    RecurseCmdDict(call_graph, out_file, log_file)
+
+    # Output the DOT footer
+    print(u"}", file=out_file)
+
+def RecurseCmdDict(cg, out_file=sys.stdout, log_file=sys.stderr): 
+    for k in cg.cmddict:
+        gd = cg.cmddict.get(k)
+        if isinstance(gd.cmddict, dict):
+            PrintDotContents(gd, out_file, log_file, True, False, None, False, 3, 7, 7)
+            RecurseCmdDict(gd, out_file, log_file)
+
+def PrintDotContents(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_calls=True, show_node_stats=False, nodes_to_hide=None, represent_node_size=False, min_node_size=3, max_node_size=7, font_scale_factor=7):
     if min_node_size > max_node_size:
         min_node_size, max_node_size = max_node_size, min_node_size
 
@@ -24,9 +48,6 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
     if min_node_size < 1:
         min_node_size = 1
-    
-    # Output the DOT code.
-    print(u"digraph g {", file=out_file)
 
     max_node_loc = 0
 
@@ -44,15 +65,22 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
 
         name = node.name
         pretty_name = name
-        if node.original_name != "":
-            pretty_name = node.original_name
+ 
+        # cgreen - handling reference from external called script 
+        #  to the begin node of that script contents
+        if "__begin__" in name: 
+            pretty_name = "__begin__"
+        elif node.original_name != "":
+            pretty_name = node.original_name  
 
         print(u"Processing node {0} (using name: {1})".format(node.name, pretty_name), file=log_file)
 
         attributes = []
         label_lines = ["<b>{}</b>".format(pretty_name)]
 
-        if node.line_number > 0:
+        if node.line_number < 0:
+            attributes.append("style=filled,fillcolor={},shape=folder,margin=.3".format(COLORS["folder_start"])) 
+        elif node.line_number > 0:
             label_lines.append("(line {})".format(node.line_number))
 
         if show_node_stats:
@@ -82,7 +110,7 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
             attributes.append("fontsize={}".format(nw * font_scale_factor))
 
         if attributes:
-            print(u"\"{}\" [{}]".format(name, ",".join(attributes)), file=out_file)
+            print(u"\"{}\" [{}]".format(node.ID, ",".join(attributes)), file=out_file) # cgreen - change name to node.id
 
         # De-duplicate connections by line number if show_all_calls is set to
         # False.
@@ -100,6 +128,17 @@ def PrintDot(call_graph, out_file=sys.stdout, log_file=sys.stderr, show_all_call
                 label = "<<b>{}</b><br />(line {})>".format(c.kind, c.line_number)
             src_escaped_name = _Escape(name)
             dst_escaped_name = _Escape(c.dst)
-            print(u"\"{}\" -> \"{}\" [label={},color={}]".format(src_escaped_name, dst_escaped_name, label, COLORS[c.kind]), file=out_file)
+            if "~" in dst_escaped_name:
+                dst_escaped_name = dst_escaped_name.split('~')[1]
+            if c.kind == "external_program":
+                # represent external program a grey folder shape
+                print(u"\"{}\" [style=filled,shape=folder]".format(dst_escaped_name), file=out_file)
+            elif (c.kind == "external_call") and (c.line_number > 0): 
+                # any other external cmd files at this point haven't been parsed (due to max call depth)
+                #  so just render as a dark folder shape
+                #  & there was a bug here where rendering the name without the label attribute was
+                #   causing the name in the shape to appear to need to be escaped
+                print(u"\"{0}\" [style=filled,shape=folder,margin=.3,fillcolor={2},label=<<b>{1}</b><br/>End Parsing>]".format(node.ID, dst_escaped_name, COLORS["folder_end"]), file=out_file)
 
-    print(u"}", file=out_file)
+            print(u"\"{}\" -> \"{}\" [label={},color={}]".format(node.ID, c.dst, label, COLORS[c.kind]), file=out_file)
+            # cgreen - change src_escaped_name to node.id, dst_escpated_name to c.dst
