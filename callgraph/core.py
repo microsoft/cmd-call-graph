@@ -159,14 +159,17 @@ class CallGraph:
                     break
 
                 if token == "goto" or token == "@goto":
-                    block_name = tokens[i+1][1:]
+                    # Strip parentheses from the target before extracting the label name
+                    target = tokens[i+1].lstrip("(").rstrip(")")
+                    block_name = target[1:]
                     if not block_name:
                         continue
                     line.AddCommand(Command("goto", block_name))
                     continue
 
                 if token == "call" or token == "@call":
-                    target = tokens[i+1]
+                    # Strip parentheses from the target before processing
+                    target = tokens[i+1].lstrip("(").rstrip(")")
                     if target[0] != ":":
                         line.AddCommand(Command("external_call", target))
                         continue
