@@ -91,5 +91,45 @@ class PrintOptionsGraphTest(RenderTest):
         self.assertEqual(1, dot.count(r"\%command\%"), dot)
 
 
+# Regression test for issue #44: calls/goto in sub-expressions (nested within parentheses)
+# should be represented correctly in the rendered graph
+class ParenthesisLabelRenderTest(RenderTest):
+    def setUp(self):
+        RenderTest.setUp(self)
+        # Code with goto and call statements nested in parentheses
+        code = """
+        if foo==bar (call :foo) ELSE (goto :bar)
+        exit
+        :foo
+        echo "in foo"
+        goto :eof
+        :bar
+        echo "in bar"
+        goto :eof
+        """.split("\n")
+        
+        self.call_graph = CallGraph.Build(code, self.devnull)
+    
+    def test_parenthesis_labels_in_rendered_graph(self):
+        """Verify that calls to labels in sub-expressions are rendered with correct label names (without parentheses)"""
+        f = io.StringIO()
+        PrintDot(self.call_graph, f, show_all_calls=True, log_file=self.devnull)
+        dot = f.getvalue()
+        
+        # Verify that connections point to correct labels (without trailing parenthesis)
+        self.assertIn('"__begin__" -> "foo"', dot, "Connection to 'foo' should be present")
+        self.assertIn('"__begin__" -> "bar"', dot, "Connection to 'bar' should be present")
+        
+        # Verify that incorrect labels (with parenthesis) are NOT in the graph
+        self.assertNotIn('"foo)"', dot, "Label 'foo)' should not be present")
+        self.assertNotIn('"bar)"', dot, "Label 'bar)' should not be present")
+        self.assertNotIn('-> "foo)"', dot, "Connection to 'foo)' should not be present")
+        self.assertNotIn('-> "bar)"', dot, "Connection to 'bar)' should not be present")
+        
+        # Verify the actual node definitions use correct names
+        self.assertIn('"foo"', dot, "Node 'foo' should be defined")
+        self.assertIn('"bar"', dot, "Node 'bar' should be defined")
+
+
 if __name__ == "__main__":
     unittest.main()
