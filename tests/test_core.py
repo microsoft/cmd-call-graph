@@ -317,6 +317,78 @@ class BasicBuildTests(CallGraphTest):
         file_not_empty = call_graph.nodes["filenotempty"]
         self.assertEqual(0, len(file_not_empty.connections), file_not_empty.code)
     
+    # Regression test for issue #44: parenthesis in goto/call labels
+    def test_parenthesis_in_goto_label_regression_issue_44(self):
+        """Regression test for issue #44: right parenthesis should not be included in label names"""
+        code = """
+        if foo==bar (foo & goto :foo) ELSE (bar & goto :bar)
+        :foo
+        echo foo
+        :bar
+        echo bar
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        
+        # Verify that the nodes are created with correct names (without trailing parenthesis)
+        self.assertIn("foo", call_graph.nodes)
+        self.assertIn("bar", call_graph.nodes)
+        self.assertNotIn("foo)", call_graph.nodes)
+        self.assertNotIn("bar)", call_graph.nodes)
+        
+        # Verify that the connections point to the correct labels
+        begin_node = call_graph.nodes["__begin__"]
+        connection_dsts = [conn.dst for conn in begin_node.connections]
+        self.assertIn("foo", connection_dsts)
+        self.assertIn("bar", connection_dsts)
+        self.assertNotIn("foo)", connection_dsts)
+        self.assertNotIn("bar)", connection_dsts)
+
+    # Regression test for issue #44: call with parentheses
+    def test_parenthesis_in_call_label_regression_issue_44(self):
+        """Regression test for issue #44: right parenthesis should not be included in call labels"""
+        code = """
+        if foo==bar (call :foo) ELSE (call :bar)
+        exit
+        :foo
+        echo foo
+        :bar
+        echo bar
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        
+        # Verify that the nodes are created with correct names (without trailing parenthesis)
+        self.assertIn("foo", call_graph.nodes)
+        self.assertIn("bar", call_graph.nodes)
+        self.assertNotIn("foo)", call_graph.nodes)
+        self.assertNotIn("bar)", call_graph.nodes)
+        
+        # Verify that the connections point to the correct labels
+        begin_node = call_graph.nodes["__begin__"]
+        connection_dsts = [conn.dst for conn in begin_node.connections]
+        self.assertIn("foo", connection_dsts)
+        self.assertIn("bar", connection_dsts)
+        self.assertNotIn("foo)", connection_dsts)
+        self.assertNotIn("bar)", connection_dsts)
+
+    # Regression test for issue #44: multiple nested parentheses
+    def test_multiple_parentheses_in_label_regression_issue_44(self):
+        """Regression test for issue #44: multiple parentheses should be stripped correctly"""
+        code = """
+        if x==y ((goto :label))
+        :label
+        echo test
+        """.split("\n")
+        call_graph = CallGraph.Build(code, self.devnull)
+        
+        # Verify that the node is created with correct name
+        self.assertIn("label", call_graph.nodes)
+        self.assertNotIn("label))", call_graph.nodes)
+        self.assertNotIn("label)", call_graph.nodes)
+        
+        # Verify that the connection points to the correct label
+        begin_node = call_graph.nodes["__begin__"]
+        connection_dsts = [conn.dst for conn in begin_node.connections]
+        self.assertIn("label", connection_dsts)
 
 if __name__ == "__main__":
     unittest.main()

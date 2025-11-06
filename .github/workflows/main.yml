@@ -15,7 +15,7 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
@@ -35,7 +35,7 @@ jobs:
       run: |
         pytest tests --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=callgraph --cov-report=xml --cov-report=html
     - name: Upload pytest test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: pytest-results-${{ matrix.python-version }}.xml
         path: junit/test-results-${{ matrix.python-version }}.xml
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python 3.8
       uses: actions/setup-python@v6
       with:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python 3.8
       uses: actions/setup-python@v6
       with:
