@@ -1,14 +1,18 @@
 from os import path
 from setuptools import setup
+import re
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as readme:
     long_description = readme.read()
 
-# Read version from __init__.py
-version = {}
+# Read version from __init__.py using regex to avoid exec()
 with open(path.join(this_directory, "callgraph", "__init__.py"), encoding="utf-8") as f:
-    exec(f.read(), version)
+    version_match = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE)
+    if version_match:
+        version = version_match.group(1)
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 setup(
     name="cmd-call-graph",
@@ -16,7 +20,7 @@ setup(
     entry_points={
         "console_scripts": ["cmd-call-graph = callgraph.callgraph:main"]
     },
-    version=version["__version__"],
+    version=version,
     author="Andrea Spadaccini",
     author_email="andrea.spadaccini@gmail.com",
     description="A simple tool to generate a call graph for calls within Windows CMD (batch) files.",
