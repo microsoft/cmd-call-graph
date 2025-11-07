@@ -9,6 +9,7 @@ import sys
 
 from . import core
 from . import render
+from . import __version__
 
 DEFAULT_MIN_NODE_SIZE = 3
 DEFAULT_MAX_NODE_SIZE = 7
@@ -16,6 +17,7 @@ DEFAULT_FONT_SCALE_FACTOR = 7
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("input", help="Input cmd file.",
                         type=str)
     parser.add_argument("--simplify-calls",
