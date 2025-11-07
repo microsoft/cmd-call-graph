@@ -5,13 +5,18 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as readme:
     long_description = readme.read()
 
+# Read version from __init__.py
+version = {}
+with open(path.join(this_directory, "callgraph", "__init__.py"), encoding="utf-8") as f:
+    exec(f.read(), version)
+
 setup(
     name="cmd-call-graph",
     packages=["callgraph"],
     entry_points={
         "console_scripts": ["cmd-call-graph = callgraph.callgraph:main"]
     },
-    version="1.2.1",
+    version=version["__version__"],
     author="Andrea Spadaccini",
     author_email="andrea.spadaccini@gmail.com",
     description="A simple tool to generate a call graph for calls within Windows CMD (batch) files.",
